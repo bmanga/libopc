@@ -146,9 +146,9 @@ opc_error_t opcContainerDeletePart(opcContainer *container, const xmlChar *name)
         if (-1!=container->part_array[i].rel_segment_id) {
             opcContainerDeletePartEx(container, name, true);
         }
-        assert(OPC_ERROR_NONE==opcContainerDeleteAllRelationsToPart(container, container->part_array[i].name, &container->relation_array, &container->relation_items));
+        OPC_ENSURE(OPC_ERROR_NONE==opcContainerDeleteAllRelationsToPart(container, container->part_array[i].name, &container->relation_array, &container->relation_items));
         for(uint32_t j=0;j<container->part_items;j++) {
-            assert(OPC_ERROR_NONE==opcContainerDeleteAllRelationsToPart(container, container->part_array[i].name, &container->part_array[j].relation_array, &container->part_array[j].relation_items));
+            OPC_ENSURE(OPC_ERROR_NONE==opcContainerDeleteAllRelationsToPart(container, container->part_array[i].name, &container->part_array[j].relation_array, &container->part_array[j].relation_items));
         }
         if (NULL!=container->part_array[i].relation_array){
             xmlFree(container->part_array[i].relation_array);
@@ -469,7 +469,7 @@ static void opcConstainerParseRels(opcContainer *c, const xmlChar *partName, opc
                 } mce_end_children(&reader);
             } mce_end_element(&reader);
         } mce_end_document(reader);
-        assert(0==mceTextReaderCleanup(&reader));
+        OPC_ENSURE(0==mceTextReaderCleanup(&reader));
     }
 }
 
@@ -749,7 +749,7 @@ static opc_error_t opcContainerZipLoaderLoadSegment(void *iocontext,
                               opcZipLoaderSkipCallback *skip) {
     opc_error_t err=OPC_ERROR_NONE;
     opcContainer *c=(opcContainer *)userctx;
-    assert(0==skip(iocontext));
+    OPC_ENSURE(0==skip(iocontext));
     if (info->rels_segment) {
         if (info->name[0]==0) {
             assert(-1==c->rels_segment_id); // loaded twice??
@@ -949,7 +949,7 @@ static opcContainer *opcContainerLoadFromZip(opcContainer *c) {
     if (NULL!=c->storage) {
         if (OPC_ERROR_NONE==opcZipLoader(&c->io, c, opcContainerZipLoaderLoadSegment)) {
             // successfull loaded!
-            assert(OPC_ERROR_NONE==opcZipGC(c->storage));
+            OPC_ENSURE(OPC_ERROR_NONE==opcZipGC(c->storage));
             if (-1!=c->content_types_segment_id) {
                 mceTextReader_t reader;
                 if (OPC_ERROR_NONE==opcXmlReaderOpenEx(c, &reader, OPC_SEGMENT_CONTENTTYPES, false, NULL, NULL, 0)) {
@@ -998,7 +998,7 @@ static opcContainer *opcContainerLoadFromZip(opcContainer *c) {
                                         opcContainerType*ct=insertType(c, type, true);
                                         mce_error(&reader, NULL==ct, MCE_ERROR_MEMORY, NULL);
                                         mce_error_strictf(&reader, '/'!=name[0], MCE_ERROR_MEMORY, "Part %s MUST start with a '/'", name);
-                                        opcContainerPart *part=opcContainerInsertPart(c, (name[0]=='/'?name+1:name), true);
+                                        opcContainerPart *part=opcContainerInsertPart(c, (name[0]=='/'?name+1:name), false);
                                         mce_error_strictf(&reader, NULL==part, MCE_ERROR_MEMORY, "Part %s does not exist.", name);
                                         if (NULL!=part) {
                                             part->type=ct->type;
@@ -1012,7 +1012,7 @@ static opcContainer *opcContainerLoadFromZip(opcContainer *c) {
                             } mce_end_children(&reader);
                         } mce_end_element(&reader);
                     } mce_end_document(&reader);
-                    assert(0==mceTextReaderCleanup(&reader));
+                    OPC_ENSURE(0==mceTextReaderCleanup(&reader));
                 }
             }
             if (NULL!=c && -1!=c->rels_segment_id) {
@@ -1063,7 +1063,7 @@ opcContainer* opcContainerOpenMem(const uint8_t *data, uint32_t data_len,
                                   void *userContext) {
     opcContainer*c=(opcContainer*)xmlMalloc(sizeof(opcContainer));
     if (NULL!=c) {
-        assert(OPC_ERROR_NONE==opcContainerInit(c, mode, userContext));
+        OPC_ENSURE(OPC_ERROR_NONE==opcContainerInit(c, mode, userContext));
         if (OPC_ERROR_NONE==opcFileInitIOMemory(&c->io, data, data_len, opcContainerGenerateFileFlags(mode))) {
             c=opcContainerLoadFromZip(c);
         } else {
@@ -1085,7 +1085,7 @@ opcContainer* opcContainerOpenIO(opcFileReadCallback *ioread,
                                  void *userContext) {
     opcContainer*c=(opcContainer*)xmlMalloc(sizeof(opcContainer));
     if (NULL!=c) {
-        assert(OPC_ERROR_NONE==opcContainerInit(c, mode, userContext));
+        OPC_ENSURE(OPC_ERROR_NONE==opcContainerInit(c, mode, userContext));
         if (OPC_ERROR_NONE==opcFileInitIO(&c->io, ioread, iowrite, ioclose, ioseek, iotrim, ioflush, iocontext, file_size, opcContainerGenerateFileFlags(mode))) {
             c=opcContainerLoadFromZip(c);
         } else {
@@ -1098,29 +1098,29 @@ opcContainer* opcContainerOpenIO(opcFileReadCallback *ioread,
 
 static void opcContainerWriteUtf8Raw(opcContainerOutputStream *out, const xmlChar *str) {
     uint32_t str_len=xmlStrlen(str);
-    assert(str_len==opcContainerWriteOutputStream(out, str, str_len));
+    OPC_ENSURE(str_len==opcContainerWriteOutputStream(out, str, str_len));
 }
 
 static void opcContainerWriteUtf8(opcContainerOutputStream *out, const xmlChar *str) {
     for(;0!=*str; str++) {
         switch(*str) {
         case '"':
-            assert(6==opcContainerWriteOutputStream(out, BAD_CAST("&quot;"), 6));
+            OPC_ENSURE(6==opcContainerWriteOutputStream(out, BAD_CAST("&quot;"), 6));
             break;
         case '\'':
-            assert(6==opcContainerWriteOutputStream(out, BAD_CAST("&apos;"), 6));
+            OPC_ENSURE(6==opcContainerWriteOutputStream(out, BAD_CAST("&apos;"), 6));
             break;
         case '&':
-            assert(5==opcContainerWriteOutputStream(out, BAD_CAST("&amp;"), 5));
+            OPC_ENSURE(5==opcContainerWriteOutputStream(out, BAD_CAST("&amp;"), 5));
             break;
         case '<':
-            assert(4==opcContainerWriteOutputStream(out, BAD_CAST("&lt;"), 4));
+            OPC_ENSURE(4==opcContainerWriteOutputStream(out, BAD_CAST("&lt;"), 4));
             break;
         case '>':
-            assert(4==opcContainerWriteOutputStream(out, BAD_CAST("&gt;"), 4));
+            OPC_ENSURE(4==opcContainerWriteOutputStream(out, BAD_CAST("&gt;"), 4));
             break;
         default:
-            assert(1==opcContainerWriteOutputStream(out, str, 1));
+            OPC_ENSURE(1==opcContainerWriteOutputStream(out, str, 1));
             break;
         }
     }

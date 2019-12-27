@@ -129,7 +129,7 @@ static void mceTextReaderProcessAttributes(xmlTextReader *reader, mceCtx_t *ctx,
                         for(xmlChar *prefix=xmlStrArrayFirst(v, &prefix_len);xmlStrArrayValid(prefix);prefix=xmlStrArrayNext(prefix, &prefix_len)) {
                             xmlChar *ns_=xmlTextReaderLookupNamespace(reader, prefix);
                             if (NULL!=ns_ && NULL==mceQNameLevelLookup(&ctx->understands_set, ns_, NULL, false)) {
-                                assert(mceQNameLevelAdd(&ctx->ignorable_set, ns_, NULL, level));
+                                OPC_ENSURE(mceQNameLevelAdd(&ctx->ignorable_set, ns_, NULL, level));
                             }
                             xmlFree(ns_);
                         }
@@ -148,7 +148,7 @@ static void mceTextReaderProcessAttributes(xmlTextReader *reader, mceCtx_t *ctx,
                             };
                             xmlChar *ns_=xmlTextReaderLookupNamespace(reader, qname+prefix);
                             if (NULL!=ns_ && NULL==mceQNameLevelLookup(&ctx->understands_set, ns_, NULL, false)) {
-                                assert(mceQNameLevelAdd(&ctx->processcontent_set, ns_, xmlStrdup(qname+ln), level));
+                                OPC_ENSURE(mceQNameLevelAdd(&ctx->processcontent_set, ns_, xmlStrdup(qname+ln), level));
 
                             }
                         }
@@ -202,7 +202,7 @@ static void mceTextReaderProcessAttributes(xmlTextReader *reader, mceCtx_t *ctx,
                         remove=(xmlAttrPtr)xmlTextReaderCurrentNode(reader);
                 }
             } while (1==xmlTextReaderMoveToNextAttribute(reader));
-            assert(1==xmlTextReaderMoveToElement(reader));
+            OPC_ENSURE(1==xmlTextReaderMoveToElement(reader));
             if (NULL!=remove) {
                 xmlRemoveProp(remove); remove=NULL;
             }
@@ -221,10 +221,10 @@ static bool mceTextReaderProcessStartElement(xmlTextReader *reader, mceCtx_t *ct
             xmlChar *req_ns=NULL;
             if (1==xmlTextReaderMoveToAttribute(reader, BAD_CAST("Requires"))) {
                 req_ns=xmlTextReaderLookupNamespace(reader, xmlTextReaderConstValue(reader));
-                assert(1==xmlTextReaderMoveToElement(reader));
+                OPC_ENSURE(1==xmlTextReaderMoveToElement(reader));
             } else if (1==xmlTextReaderMoveToAttributeNs(reader, BAD_CAST("Requires"), BAD_CAST(ns_mce))) {
                 req_ns=xmlTextReaderLookupNamespace(reader, xmlTextReaderConstValue(reader));
-                assert(1==xmlTextReaderMoveToElement(reader));
+                OPC_ENSURE(1==xmlTextReaderMoveToElement(reader));
             }
             if (NULL==req_ns) {
                 mceRaiseError(reader, ctx, MCE_ERROR_XML, BAD_CAST("Missing \"Requires\" attribute"));
@@ -309,7 +309,7 @@ int mceTextReaderPostprocess(xmlTextReader *reader, mceCtx_t *ctx, int ret) {
         if (XML_READER_TYPE_ELEMENT==xmlTextReaderNodeType(reader)) {
             skip=mceTextReaderProcessStartElement(reader, ctx, xmlTextReaderDepth(reader), ns, ln);
             if (xmlTextReaderIsEmptyElement(reader)) {
-                assert(mceTextReaderProcessEndElement(reader, ctx, xmlTextReaderDepth(reader), ns, ln)==skip);
+                OPC_ENSURE(mceTextReaderProcessEndElement(reader, ctx, xmlTextReaderDepth(reader), ns, ln)==skip);
             }
         } else if (XML_READER_TYPE_END_ELEMENT==xmlTextReaderNodeType(reader)) {
             skip=mceTextReaderProcessEndElement(reader, ctx, xmlTextReaderDepth(reader), ns, ln);
@@ -377,7 +377,7 @@ int mceTextReaderDump(mceTextReader_t *mceTextReader, xmlTextWriter *writer, boo
                     }
                 } while (1==xmlTextReaderMoveToNextAttribute(mceTextReader->reader));
             }
-            assert(1==xmlTextReaderMoveToElement(mceTextReader->reader));
+            OPC_ENSURE(1==xmlTextReaderMoveToElement(mceTextReader->reader));
         }
         if (!xmlTextReaderIsEmptyElement(mceTextReader->reader)) {
             ret=mceTextReaderRead(mceTextReader); // read start element

@@ -105,9 +105,9 @@ static int opcFileFlush(void *iocontext) {
 
 static uint32_t opcFileLength(void *iocontext) {
     size_t current=ftell((FILE*)iocontext);
-    assert(fseek((FILE*)iocontext, 0, SEEK_END)>=0);
+    OPC_ENSURE(fseek((FILE*)iocontext, 0, SEEK_END)>=0);
     size_t length=ftell((FILE*)iocontext);
-    assert(fseek((FILE*)iocontext, current, SEEK_SET)>=0);
+    OPC_ENSURE(fseek((FILE*)iocontext, current, SEEK_SET)>=0);
     assert(current==ftell((FILE*)iocontext));
     return length;
 }

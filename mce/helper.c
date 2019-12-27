@@ -109,18 +109,18 @@ bool mceCtxInit(mceCtx_t *ctx) {
 bool mceCtxCleanup(mceCtx_t *ctx) {
 
     assert(ctx->error!=MCE_ERROR_NONE || 0==ctx->ignorable_set.list_items);
-    assert(mceQNameLevelCleanup(&ctx->ignorable_set, 0));
-    assert(mceQNameLevelCleanup(&ctx->understands_set, 0));
+    OPC_ENSURE(mceQNameLevelCleanup(&ctx->ignorable_set, 0));
+    OPC_ENSURE(mceQNameLevelCleanup(&ctx->understands_set, 0));
     assert(ctx->error!=MCE_ERROR_NONE || 0==ctx->skip_stack.stack_items);
     while (NULL!=mceSkipStackTop(&ctx->skip_stack)) mceSkipStackPop(&ctx->skip_stack);
     assert(ctx->error!=MCE_ERROR_NONE || 0==ctx->processcontent_set.list_items);
-    assert(mceQNameLevelCleanup(&ctx->processcontent_set, 0));
-    assert(mceQNameLevelCleanup(&ctx->suspended_set, 0));
+    OPC_ENSURE(mceQNameLevelCleanup(&ctx->processcontent_set, 0));
+    OPC_ENSURE(mceQNameLevelCleanup(&ctx->suspended_set, 0));
     assert(ctx->error!=MCE_ERROR_NONE || 0==ctx->suspended_level);
 #if (MCE_NAMESPACE_SUBSUMPTION_ENABLED)
-    assert(mceQNameLevelCleanup(&ctx->subsume_namespace_set, 0));
-    assert(mceQNameLevelCleanup(&ctx->subsume_exclude_set, 0));
-    assert(mceQNameLevelCleanup(&ctx->subsume_prefix_set, 0));
+    OPC_ENSURE(mceQNameLevelCleanup(&ctx->subsume_namespace_set, 0));
+    OPC_ENSURE(mceQNameLevelCleanup(&ctx->subsume_exclude_set, 0));
+    OPC_ENSURE(mceQNameLevelCleanup(&ctx->subsume_prefix_set, 0));
 #endif
     
     if (NULL!=ctx->ignorable_set.list_array) xmlFree(ctx->ignorable_set.list_array);
