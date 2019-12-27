@@ -39,7 +39,7 @@
     opc_helloworld
 */
 
-#include <opc/opc.h>
+config.h>/opc.h>
 #include <stdio.h>
 #ifdef WIN32
 #include <crtdbg.h>

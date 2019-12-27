@@ -30,11 +30,11 @@
  OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <opc/opc.h>
+config.h>/opc.h>
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
-#include <opc/zip.h> 
+config.h>/zip.h> 
 #include <zlib.h> // for crc32 function
 #ifdef WIN32
 #include <crtdbg.h>
@@ -55,7 +55,7 @@
     opc_zipread --skip OOXMLI1.docx
 */
 
-static opc_bool_t verify_crc = OPC_FALSE;
+static bool verify_crc = false;
 
 opc_error_t loadSegment(void *iocontext, 
                         void *userctx, 
@@ -77,7 +77,7 @@ opc_error_t loadSegment(void *iocontext,
         printf("skipped\n");
     } else {
         // enable this to very the CRC checksums
-        opc_bool_t ok=OPC_FALSE;
+        bool ok=false;
         if (0==open(iocontext)) {
             opc_uint32_t crc=0;
             char buf[OPC_DEFLATE_BUFFER_SIZE];
@@ -107,13 +107,13 @@ int main( int argc, const char* argv[] )
     opc_error_t err=OPC_ERROR_NONE;
     if (OPC_ERROR_NONE==(err=opcInitLibrary())) {
         for(int i=1;OPC_ERROR_NONE==err && i<argc;i++) {
-            if (xmlStrcasecmp(_X(argv[i]), _X("--verify"))==0) {
-                verify_crc=OPC_TRUE;
-            } else if (xmlStrcasecmp(_X(argv[i]), _X("--skip"))==0) {
-                verify_crc=OPC_FALSE;
+            if (xmlStrcasecmp(BAD_CAST(argv[i]), BAD_CAST("--verify"))==0) {
+                verify_crc=true;
+            } else if (xmlStrcasecmp(BAD_CAST(argv[i]), BAD_CAST("--skip"))==0) {
+                verify_crc=false;
             } else {
                 opcIO_t io;
-                if (OPC_ERROR_NONE==opcFileInitIOFile(&io, _X(argv[i]), OPC_FILE_READ)) {
+                if (OPC_ERROR_NONE==opcFileInitIOFile(&io, BAD_CAST(argv[i]), OPC_FILE_READ)) {
                     err=opcZipLoader(&io, NULL, loadSegment);
                 }
                 OPC_ENSURE(OPC_ERROR_NONE==opcFileCleanupIO(&io));

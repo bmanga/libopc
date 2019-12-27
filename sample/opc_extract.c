@@ -40,7 +40,7 @@
 */
 
 
-#include <opc/opc.h>
+config.h>/opc.h>
 #include <stdio.h>
 #ifdef WIN32
 #include <io.h>
@@ -61,9 +61,9 @@ int main( int argc, const char* argv[] )
 #endif
     if (OPC_ERROR_NONE==opcInitLibrary() && 3==argc) {
         opcContainer *c=NULL;
-        if (NULL!=(c=opcContainerOpen(_X(argv[1]), OPC_OPEN_READ_ONLY, NULL, NULL))) {
+        if (NULL!=(c=opcContainerOpen(BAD_CAST(argv[1]), OPC_OPEN_READ_ONLY, NULL, NULL))) {
             opcPart part=OPC_PART_INVALID;
-            if ((part=opcPartFind(c, _X(argv[2]), NULL, 0))!=OPC_PART_INVALID) {
+            if ((part=opcPartFind(c, BAD_CAST(argv[2]), NULL, 0))!=OPC_PART_INVALID) {
                 opcContainerInputStream *stream=NULL;
                 if ((stream=opcContainerOpenInputStream(c, part))!=NULL){
                     opc_uint8_t buf[100];

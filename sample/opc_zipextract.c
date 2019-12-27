@@ -38,7 +38,7 @@
     Sample:
     opc_zipextract OOXMLI1.docx
 */
-#include <opc/opc.h>
+config.h>/opc.h>
 #include <stdio.h>
 #include <libxml/xmlstring.h>
 #include <time.h>
@@ -89,7 +89,7 @@ int main( int argc, const char* argv[] )
     if (OPC_ERROR_NONE==(err=opcInitLibrary())) {
         if (argc>2) {
             opcIO_t io;
-            if (OPC_ERROR_NONE==opcFileInitIOFile(&io, _X(argv[1]), OPC_FILE_READ)) {
+            if (OPC_ERROR_NONE==opcFileInitIOFile(&io, BAD_CAST(argv[1]), OPC_FILE_READ)) {
                 opcZip *zip=opcZipCreate(&io);
                 if (NULL!=zip) {
                     err=opcZipLoader(&io, zip, loadSegment);
@@ -99,11 +99,11 @@ int main( int argc, const char* argv[] )
                             -1!=segment_id;
                             segment_id=opcZipGetNextSegmentId(zip, segment_id)) {
                             const xmlChar *name=NULL;
-                            opc_bool_t rels_segment=OPC_FALSE;
+                            bool rels_segment=false;
                             opc_uint32_t data_crc=0;
                             OPC_ENSURE(OPC_ERROR_NONE==opcZipGetSegmentInfo(zip, segment_id, &name, &rels_segment, &data_crc));
                             OPC_ASSERT(NULL!=name);
-                            if (!rels_segment && 0==xmlStrcmp(name, _X(argv[2]))) {
+                            if (!rels_segment && 0==xmlStrcmp(name, BAD_CAST(argv[2]))) {
                                 printf("extracting  \"%s\"\n", name);
                                 opcZipInputStream *stream=opcZipOpenInputStream(zip, segment_id);
                                 if (NULL!=stream) {

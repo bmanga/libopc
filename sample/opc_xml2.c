@@ -39,12 +39,13 @@
     opc_xml2 OOXMLI1.docx
 */
 
-#include <opc/opc.h>
 #include <stdio.h>
 #include <string.h>
 #ifdef WIN32
 #include <crtdbg.h>
 #endif
+
+#include <opc/opc.h>
 
 const char PROP_NS[]="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties";
 
@@ -63,15 +64,15 @@ int main( int argc, const char* argv[] )
 
     if (OPC_ERROR_NONE==opcInitLibrary() && 2==argc) {
         opcContainer *c=NULL;
-        if (NULL!=(c=opcContainerOpen(_X(argv[1]), OPC_OPEN_READ_ONLY, NULL, NULL))) {
+        if (NULL!=(c=opcContainerOpen(BAD_CAST(argv[1]), OPC_OPEN_READ_ONLY, NULL, NULL))) {
             AppDocProps props;
             memset(&props, 0, sizeof(props));
             mceTextReader_t reader;
-            if (OPC_ERROR_NONE==opcXmlReaderOpen(c, &reader, _X("docProps/app.xml"), NULL, 0, 0)) {
+            if (OPC_ERROR_NONE==opcXmlReaderOpen(c, &reader, BAD_CAST("docProps/app.xml"), NULL, 0, 0)) {
                 mce_start_document(&reader) {
-                    mce_start_element(&reader, _X(PROP_NS), _X("Properties")) {
+                    mce_start_element(&reader, BAD_CAST(PROP_NS), BAD_CAST("Properties")) {
                         mce_start_children (&reader) {
-                            mce_start_element(&reader, _X(PROP_NS), _X("Application")) {
+                            mce_start_element(&reader, BAD_CAST(PROP_NS), BAD_CAST("Application")) {
                                 if (props.application!=NULL) {
                                     xmlFree(props.application);
                                     props.application=NULL;
@@ -83,7 +84,7 @@ int main( int argc, const char* argv[] )
                                     } mce_end_text(&reader);
                                 } mce_end_children(&reader);
                             } mce_end_element(&reader);
-                            mce_start_element(&reader, _X(PROP_NS), _X("Words")) {
+                            mce_start_element(&reader, BAD_CAST(PROP_NS), BAD_CAST("Words")) {
                                 props.words=0;
                                 mce_skip_attributes(&reader);
                                 mce_start_children(&reader) {
@@ -92,7 +93,7 @@ int main( int argc, const char* argv[] )
                                     } mce_end_text(&reader);
                                 } mce_end_children(&reader);
                             } mce_end_element(&reader);
-                            mce_start_element(&reader, _X(PROP_NS), _X("Lines")) {
+                            mce_start_element(&reader, BAD_CAST(PROP_NS), BAD_CAST("Lines")) {
                                 props.lines=0;
                                 mce_skip_attributes(&reader);
                                 mce_start_children(&reader) {
@@ -101,7 +102,7 @@ int main( int argc, const char* argv[] )
                                     } mce_end_text(&reader);
                                 } mce_end_children(&reader);
                             } mce_end_element(&reader);
-                            mce_start_element(&reader, _X(PROP_NS), _X("Pages")) {
+                            mce_start_element(&reader, BAD_CAST(PROP_NS), BAD_CAST("Pages")) {
                                 props.pages=0;
                                 mce_skip_attributes(&reader);
                                 mce_start_children(&reader) {

@@ -1,4 +1,4 @@
-#include <opc/opc.h>
+config.h>/opc.h>
 #include <stdio.h>
 #include <time.h>
 #ifdef WIN32
@@ -8,7 +8,7 @@
 typedef void (paragraph_callback_t)(void *callback_ctx, int level, xmlChar *modeTxt, xmlChar *parTxt);
 
 typedef struct CHANGE_MODE {
-    opc_bool_t deleted;
+    bool deleted;
     xmlChar *mode;
 } changemode_t;
 
@@ -25,7 +25,7 @@ static void cleanupMode(changemode_t *mode) {
 
 typedef struct PARSER_CONTEXT {
     xmlChar *modeTxt;
-    opc_bool_t deleted;
+    bool deleted;
     xmlChar *parTxt;
     void *callback_ctx;
     paragraph_callback_t *callback_fct;
@@ -45,18 +45,18 @@ static void cleanup(context_t *ctx) {
 static void text(context_t *ctx, const xmlChar *text, changemode_t *textMode) {
     if (NULL!=textMode) {
         ctx->modeTxt=xmlStrcat(ctx->modeTxt, textMode->mode);
-        ctx->modeTxt=xmlStrcat(ctx->modeTxt, _X(": \""));
+        ctx->modeTxt=xmlStrcat(ctx->modeTxt, BAD_CAST(": \""));
         ctx->modeTxt=xmlStrcat(ctx->modeTxt, text);
-        ctx->modeTxt=xmlStrcat(ctx->modeTxt, _X("\"\n"));
+        ctx->modeTxt=xmlStrcat(ctx->modeTxt, BAD_CAST("\"\n"));
     }
     if (NULL!=textMode && textMode->deleted) {
         if (!ctx->deleted) {
-            ctx->parTxt=xmlStrcat(ctx->parTxt, _X("[]"));
+            ctx->parTxt=xmlStrcat(ctx->parTxt, BAD_CAST("[]"));
         }
-        ctx->deleted=OPC_TRUE;
+        ctx->deleted=true;
     } else {
         ctx->parTxt=xmlStrcat(ctx->parTxt, text);
-        ctx->deleted=OPC_FALSE;
+        ctx->deleted=false;
     }
 }
 
@@ -64,25 +64,25 @@ static void par(context_t *ctx, int level, changemode_t *parMode, changemode_t *
     if (NULL!=rowMode && NULL!=rowMode->mode) {
         xmlChar *modeTxt=NULL;;
         modeTxt=xmlStrcat(modeTxt, rowMode->mode);
-        modeTxt=xmlStrcat(modeTxt, _X(": row mark\n"));
+        modeTxt=xmlStrcat(modeTxt, BAD_CAST(": row mark\n"));
         ctx->modeTxt=xmlStrcat(ctx->modeTxt, modeTxt);
         xmlFree(modeTxt);
     }
     if (NULL!=parMode && NULL!=parMode->mode) {
         xmlChar *modeTxt=NULL;;
         modeTxt=xmlStrcat(modeTxt, parMode->mode);
-        modeTxt=xmlStrcat(modeTxt, _X(": paragraph mark\n"));
+        modeTxt=xmlStrcat(modeTxt, BAD_CAST(": paragraph mark\n"));
         ctx->modeTxt=xmlStrcat(ctx->modeTxt, modeTxt);
         xmlFree(modeTxt);
     }
     if (NULL!=parMode &&  parMode->deleted) {
         if (!ctx->deleted) {
-            ctx->parTxt=xmlStrcat(ctx->parTxt, _X("[]"));
+            ctx->parTxt=xmlStrcat(ctx->parTxt, BAD_CAST("[]"));
         }
-        ctx->deleted=OPC_TRUE;
+        ctx->deleted=true;
     } else {
-        ctx->parTxt=xmlStrcat(ctx->parTxt, _X("\n"));
-        ctx->deleted=OPC_FALSE;
+        ctx->parTxt=xmlStrcat(ctx->parTxt, BAD_CAST("\n"));
+        ctx->deleted=false;
         flush(ctx, level);
     }
 }
@@ -105,7 +105,7 @@ static void dumpChildren(context_t *ctx, mceTextReader_t *reader, int level, cha
 
 static void dumpText(context_t *ctx, mceTextReader_t *reader, int level, changemode_t *textMode, changemode_t *parMode, changemode_t *cellMode, changemode_t *rowMode, changemode_t *prop_mode) {
     mce_start_choice(reader) {
-        mce_start_element(reader, _X(ns_w), _X("t")) {
+        mce_start_element(reader, BAD_CAST(ns_w), BAD_CAST("t")) {
             mce_skip_attributes(reader);
             mce_start_children(reader) {
                 mce_start_text(reader) {
@@ -113,7 +113,7 @@ static void dumpText(context_t *ctx, mceTextReader_t *reader, int level, changem
                 } mce_end_text(reader);
             } mce_end_children(reader);
         } mce_end_element(reader);
-        mce_start_element(reader, _X(ns_w), _X("delText")) {
+        mce_start_element(reader, BAD_CAST(ns_w), BAD_CAST("delText")) {
             mce_skip_attributes(reader);
             mce_start_children(reader) {
                 mce_start_text(reader) {
@@ -122,13 +122,13 @@ static void dumpText(context_t *ctx, mceTextReader_t *reader, int level, changem
                 } mce_end_text(reader);
             } mce_end_children(reader);
         } mce_end_element(reader);
-        mce_start_element(reader, _X(ns_w), _X("ins")) {
+        mce_start_element(reader, BAD_CAST(ns_w), BAD_CAST("ins")) {
             changemode_t ins_props;
             initMode(&ins_props);
             ins_props.deleted=0;
-            ins_props.mode=xmlStrdup(_X("Insertion by "));
+            ins_props.mode=xmlStrdup(BAD_CAST("Insertion by "));
             mce_start_attributes(reader) {
-                mce_start_attribute(reader, _X(ns_w), _X("author")) {
+                mce_start_attribute(reader, BAD_CAST(ns_w), BAD_CAST("author")) {
                     ins_props.mode=xmlStrcat(ins_props.mode, xmlTextReaderConstValue(reader->reader));
                 } mce_end_attribute(reader);
             } mce_end_attributes(reader);
@@ -139,13 +139,13 @@ static void dumpText(context_t *ctx, mceTextReader_t *reader, int level, changem
             dumpChildren(ctx, reader, level, &ins_props, parMode, cellMode, rowMode, prop_mode);
             cleanupMode(&ins_props);
         } mce_end_element(reader);
-        mce_start_element(reader, _X(ns_w), _X("moveTo")) {
+        mce_start_element(reader, BAD_CAST(ns_w), BAD_CAST("moveTo")) {
             changemode_t ins_props;
             initMode(&ins_props);
             ins_props.deleted=0;
-            ins_props.mode=xmlStrdup(_X("Insertion by "));
+            ins_props.mode=xmlStrdup(BAD_CAST("Insertion by "));
             mce_start_attributes(reader) {
-                mce_start_attribute(reader, _X(ns_w), _X("author")) {
+                mce_start_attribute(reader, BAD_CAST(ns_w), BAD_CAST("author")) {
                     ins_props.mode=xmlStrcat(ins_props.mode, xmlTextReaderConstValue(reader->reader));
                 } mce_end_attribute(reader);
             } mce_end_attributes(reader);
@@ -156,13 +156,13 @@ static void dumpText(context_t *ctx, mceTextReader_t *reader, int level, changem
             dumpChildren(ctx, reader, level, &ins_props, parMode, cellMode, rowMode, prop_mode);
             cleanupMode(&ins_props);
         } mce_end_element(reader);
-        mce_start_element(reader, _X(ns_w), _X("del")) {
+        mce_start_element(reader, BAD_CAST(ns_w), BAD_CAST("del")) {
             changemode_t del_props;
             initMode(&del_props);
             del_props.deleted=1;
-            del_props.mode=xmlStrdup(_X("Deletion by "));
+            del_props.mode=xmlStrdup(BAD_CAST("Deletion by "));
             mce_start_attributes(reader) {
-                mce_start_attribute(reader, _X(ns_w), _X("author")) {
+                mce_start_attribute(reader, BAD_CAST(ns_w), BAD_CAST("author")) {
                     del_props.mode=xmlStrcat(del_props.mode, xmlTextReaderConstValue(reader->reader));
                 } mce_end_attribute(reader);
             } mce_end_attributes(reader);
@@ -173,13 +173,13 @@ static void dumpText(context_t *ctx, mceTextReader_t *reader, int level, changem
             dumpChildren(ctx, reader, level, &del_props, parMode, cellMode, rowMode, prop_mode);
             cleanupMode(&del_props);
         } mce_end_element(reader);
-        mce_start_element(reader, _X(ns_w), _X("moveFrom")) {
+        mce_start_element(reader, BAD_CAST(ns_w), BAD_CAST("moveFrom")) {
             changemode_t del_props;
             initMode(&del_props);
             del_props.deleted=1;
-            del_props.mode=xmlStrdup(_X("Deletion by "));
+            del_props.mode=xmlStrdup(BAD_CAST("Deletion by "));
             mce_start_attributes(reader) {
-                mce_start_attribute(reader, _X(ns_w), _X("author")) {
+                mce_start_attribute(reader, BAD_CAST(ns_w), BAD_CAST("author")) {
                     del_props.mode=xmlStrcat(del_props.mode, xmlTextReaderConstValue(reader->reader));
                 } mce_end_attribute(reader);
             } mce_end_attributes(reader);
@@ -190,12 +190,12 @@ static void dumpText(context_t *ctx, mceTextReader_t *reader, int level, changem
             dumpChildren(ctx, reader, level, &del_props, parMode, cellMode, rowMode, prop_mode);
             cleanupMode(&del_props);
         } mce_end_element(reader);
-        mce_start_element(reader, _X(ns_w), _X("p")) {
+        mce_start_element(reader, BAD_CAST(ns_w), BAD_CAST("p")) {
             changemode_t p_props;
             initMode(&p_props);
             mce_skip_attributes(reader);
             mce_start_children(reader) {
-                mce_match_element(reader, _X(ns_w), _X("pPr")) {
+                mce_match_element(reader, BAD_CAST(ns_w), BAD_CAST("pPr")) {
                     dumpText(ctx, reader, level, textMode, parMode, cellMode, rowMode, &p_props);
                 };
                 mce_match_element(reader, NULL, NULL) {
@@ -205,12 +205,12 @@ static void dumpText(context_t *ctx, mceTextReader_t *reader, int level, changem
             par(ctx, level, &p_props, cellMode, rowMode);
             cleanupMode(&p_props);
         } mce_end_element(reader);
-        mce_start_element(reader, _X(ns_w), _X("tr")) {
+        mce_start_element(reader, BAD_CAST(ns_w), BAD_CAST("tr")) {
             changemode_t tr_props;
             initMode(&tr_props);
             mce_skip_attributes(reader);
             mce_start_children(reader) {
-                mce_match_element(reader, _X(ns_w), _X("trPr")) {
+                mce_match_element(reader, BAD_CAST(ns_w), BAD_CAST("trPr")) {
                     dumpText(ctx, reader, level+1, textMode, parMode, cellMode, rowMode, &tr_props);
                 };
                 mce_match_element(reader, NULL, NULL) {
@@ -231,12 +231,12 @@ static void dumpText(context_t *ctx, mceTextReader_t *reader, int level, changem
 void parseText(xmlChar *filename, paragraph_callback_t *callback_fct, void *callback_ctx) {
     opcContainer *c=opcContainerOpen(filename, OPC_OPEN_READ_ONLY, NULL, NULL);
     if (NULL!=c) {
-        opcRelation rel=opcRelationFind(c, OPC_PART_INVALID, NULL, _X("http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument"));
+        opcRelation rel=opcRelationFind(c, OPC_PART_INVALID, NULL, BAD_CAST("http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument"));
         if (OPC_RELATION_INVALID!=rel) {
             opcPart main=opcRelationGetInternalTarget(c, OPC_PART_INVALID, rel);
             if (OPC_PART_INVALID!=main) {
                 const xmlChar *type=opcPartGetType(c, main);
-                if (0==xmlStrcmp(type, _X("application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"))) {
+                if (0==xmlStrcmp(type, BAD_CAST("application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"))) {
                     mceTextReader_t reader;
                     if (OPC_ERROR_NONE==opcXmlReaderOpen(c, &reader, main, NULL, 0, 0)) {
                         context_t ctx;
@@ -274,7 +274,7 @@ int main( int argc, const char* argv[] )
      _CrtSetDbgFlag (_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
     opcInitLibrary();
-    parseText(_X(argv[1]), paragraph_callback, stdout);
+    parseText(BAD_CAST(argv[1]), paragraph_callback, stdout);
     opcFreeLibrary();
 #ifdef WIN32
     OPC_ASSERT(!_CrtDumpMemoryLeaks());

@@ -55,11 +55,11 @@ int main( int argc, const char* argv[] )
         if (-1!=mceTextReaderInit(&reader, xmlNewTextReaderFilename(src))) {
             for(int i=1;i<argc;i++) {
                 if (0==strcmp("--understands", argv[i])) {
-                    mceTextReaderUnderstandsNamespace(&reader, _X(argv[++i]));
+                    mceTextReaderUnderstandsNamespace(&reader, BAD_CAST(argv[++i]));
                 }
             }
             xmlTextWriterPtr writer=xmlNewTextWriterFilename(dst, 0);
-            mceTextReaderDump(&reader, writer, PFALSE);
+            mceTextReaderDump(&reader, writer, false);
             xmlFreeTextWriter(writer);
             mceTextReaderCleanup(&reader);
         } else {

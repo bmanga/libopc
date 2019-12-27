@@ -44,7 +44,7 @@
  ZIP-based OPC container using a temporary file.
  
  */
-#include <opc/config.h>
+#include <config.h>
 #include <opc/file.h>
 #include <stdio.h>
 

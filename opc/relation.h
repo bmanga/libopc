@@ -33,7 +33,7 @@
 /** @file opc/relation.h
  
  */
-#include <opc/config.h>
+#include <config.h>
 
 #ifndef OPC_RELATION_H
 #define OPC_RELATION_H

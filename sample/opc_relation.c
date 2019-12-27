@@ -46,7 +46,7 @@
     opc_relation OOXMLI1.docx "word/document.xml" "rId1"
 */
 
-#include <opc/opc.h>
+config.h>/opc.h>
 #ifdef WIN32
 #include <crtdbg.h>
 #endif
@@ -76,19 +76,19 @@ int main( int argc, const char* argv[] )
 #endif
 
     opcInitLibrary();
-    opcContainer *c=opcContainerOpen(_X(argv[1]), OPC_OPEN_READ_ONLY, NULL, NULL);
+    opcContainer *c=opcContainerOpen(BAD_CAST(argv[1]), OPC_OPEN_READ_ONLY, NULL, NULL);
     if (NULL!=c) {
         if (3==argc) {
-            opcRelation rel=opcRelationFind(c, OPC_PART_INVALID, _X(argv[2]), NULL);
+            opcRelation rel=opcRelationFind(c, OPC_PART_INVALID, BAD_CAST(argv[2]), NULL);
             if (OPC_RELATION_INVALID!=rel) {
                 const xmlChar *type=NULL;
                 opcRelationGetInformation(c, OPC_PART_INVALID, rel, NULL, NULL, &type);
                 printf("type=%s\n", type);
             }
         } else if (4==argc) {
-            opcPart part=opcPartFind(c, _X(argv[2]), NULL, 0);
+            opcPart part=opcPartFind(c, BAD_CAST(argv[2]), NULL, 0);
             if (OPC_PART_INVALID!=part) {
-                opcRelation rel=opcRelationFind(c, part, _X(argv[3]), NULL);
+                opcRelation rel=opcRelationFind(c, part, BAD_CAST(argv[3]), NULL);
                 if (OPC_RELATION_INVALID!=rel) {
                     const xmlChar *type=NULL;
                     opcRelationGetInformation(c, part, rel, NULL, NULL, &type);

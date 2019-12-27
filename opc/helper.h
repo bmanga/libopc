@@ -33,7 +33,7 @@
 /** @file opc/helper.h
   Contains helper functions for the opc module.
 */
-#include <opc/config.h>
+#include <config.h>
 
 #ifndef OPC_HELPER_H
 #define OPC_HELPER_H

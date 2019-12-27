@@ -33,7 +33,7 @@
 /** @file opc/zip.h
   The ZIP file backend of an OPC container.
  */
-#include <opc/config.h>
+#include <config.h>
 #include <opc/file.h>
 #include <opc/container.h>
 

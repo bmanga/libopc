@@ -39,7 +39,7 @@
     opc_dump OOXMLI1.docx
 */
 
-#include <opc/opc.h>
+config.h>/opc.h>
 #include <stdio.h>
 #include <time.h>
 #ifdef WIN32
@@ -56,7 +56,7 @@ int main( int argc, const char* argv[] )
     if (OPC_ERROR_NONE==opcInitLibrary()) {
         if (2==argc) {
             opcContainer *c=NULL;
-            if (NULL!=(c=opcContainerOpen(_X(argv[1]), OPC_OPEN_READ_ONLY, NULL, NULL))) {
+            if (NULL!=(c=opcContainerOpen(BAD_CAST(argv[1]), OPC_OPEN_READ_ONLY, NULL, NULL))) {
                 opcContainerDump(c, stdout);
                 opcContainerClose(c, OPC_CLOSE_NOW);
             } else {

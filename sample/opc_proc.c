@@ -30,7 +30,7 @@
  OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <opc/opc.h>
+config.h>/opc.h>
 #include <stdio.h>
 #include <time.h>
 #ifdef WIN32
@@ -46,16 +46,16 @@ int main( int argc, const char* argv[] )
     opc_error_t err=OPC_ERROR_NONE;
     if (OPC_ERROR_NONE==opcInitLibrary() && argc>1) {
         opcContainer *c=NULL;
-        if (NULL!=(c=opcContainerOpen(_X(argv[1]), OPC_OPEN_READ_WRITE, NULL, NULL))) {
-            pbool_t closed=PFALSE;
+        if (NULL!=(c=opcContainerOpen(BAD_CAST(argv[1]), OPC_OPEN_READ_WRITE, NULL, NULL))) {
+            pbool_t closed=false;
             for(puint32_t i=2;i<argc;i++) {
-                if (xmlStrcmp(_X(argv[i]), _X("--dump"))==0) {
+                if (xmlStrcmp(BAD_CAST(argv[i]), BAD_CAST("--dump"))==0) {
                     opcContainerDump(c, stdout);
-                } else if (xmlStrcmp(_X(argv[i]), _X("--create"))==0 && i+4<argc) {
-                    const xmlChar *part_name=_X(argv[i+1]);
-                    const xmlChar *part_type=_X(argv[i+2]);
+                } else if (xmlStrcmp(BAD_CAST(argv[i]), BAD_CAST("--create"))==0 && i+4<argc) {
+                    const xmlChar *part_name=BAD_CAST(argv[i+1]);
+                    const xmlChar *part_type=BAD_CAST(argv[i+2]);
                     const puint32_t part_flags=atoi(argv[i+3]);
-                    if (xmlStrcasecmp(part_type, _X("NULL"))==0) {
+                    if (xmlStrcasecmp(part_type, BAD_CAST("NULL"))==0) {
                         part_type=NULL;
                     }
                     opcPart part=opcPartCreate(c, part_name, part_type, part_flags);
@@ -76,8 +76,8 @@ int main( int argc, const char* argv[] )
                         }
                     }
                     i+=4;
-                } else if (xmlStrcmp(_X(argv[i]), _X("--delete"))==0 && i+1<argc) {
-                    const xmlChar *part_name=_X(argv[i+1]);
+                } else if (xmlStrcmp(BAD_CAST(argv[i]), BAD_CAST("--delete"))==0 && i+1<argc) {
+                    const xmlChar *part_name=BAD_CAST(argv[i+1]);
                     OPC_ENSURE(OPC_ERROR_NONE==opcPartDelete(c, part_name)); 
                     i+=1;
                 } else {

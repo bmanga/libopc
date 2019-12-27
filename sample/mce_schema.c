@@ -1,4 +1,4 @@
-#include <opc/opc.h>
+config.h>/opc.h>
 #include <stdio.h>
 #include <time.h>
 #ifdef WIN32
@@ -234,7 +234,7 @@ static void readParam(SourceContext *sc, xmlChar *line, int *ofs, char *param, i
         }
         param[j-2]=0;
     } else if (NULL!=sc) {
-        xmlChar *v=getBinding(sc, _X(param));
+        xmlChar *v=getBinding(sc, BAD_CAST(param));
         if (NULL!=v && xmlStrlen(v)+1<param_max) {
             strcpy(param, (const char *)v);
         } else {
@@ -267,10 +267,10 @@ LineTokenId_t readLineToken(SourceContext *sc, LineTokenInstance* ti) {
             int mce_def_ofs=-1;
             if ('#'==line[0] && 'd'==line[1] && 'e'==line[2] && 'f'==line[3] && 'i'==line[4] && 'n'==line[5] && 'e'==line[6]) {
                 // filter out #define s
-            } else if (-1!=(mce_def_ofs=findStringInLine(line, _X("mce_def ")))) {
+            } else if (-1!=(mce_def_ofs=findStringInLine(line, BAD_CAST("mce_def ")))) {
                 ti->id=LINE_TOKEN_ID_DEF;
                 int j=0;
-                ofs=mce_def_ofs+xmlStrlen(_X("mce_def "));
+                ofs=mce_def_ofs+xmlStrlen(BAD_CAST("mce_def "));
                 while(line[ofs]!=0 && !specialChar(line[ofs])) {
                     if (j+2<sizeof(ti->param[0])) {
                         ti->param[0][j++]=line[ofs];
@@ -278,10 +278,10 @@ LineTokenId_t readLineToken(SourceContext *sc, LineTokenInstance* ti) {
                     }
                     ofs++;
                 }
-            } else if (-1!=(mce_def_ofs=findStringInLine(line, _X("mce_ref(")))) {
+            } else if (-1!=(mce_def_ofs=findStringInLine(line, BAD_CAST("mce_ref(")))) {
                 ti->id=LINE_TOKEN_ID_REF;
                 int j=0;
-                ofs=mce_def_ofs+xmlStrlen(_X("mce_ref("));
+                ofs=mce_def_ofs+xmlStrlen(BAD_CAST("mce_ref("));
                 while(line[ofs]!=0 && !specialChar(line[ofs])) {
                     if (j+2<sizeof(ti->param[0])) {
                         ti->param[0][j++]=line[ofs];
@@ -296,21 +296,21 @@ LineTokenId_t readLineToken(SourceContext *sc, LineTokenInstance* ti) {
                     ofs=1;
                 }
                 if (ofs>=0) {
-                    int t=0; while (LINE_TOKEN_ID_INVALID!=s_token[t].id && 0!=xmlStrncmp(_X(s_token[t].name), line+ofs, xmlStrlen(_X(s_token[t].name)))) t++;
+                    int t=0; while (LINE_TOKEN_ID_INVALID!=s_token[t].id && 0!=xmlStrncmp(BAD_CAST(s_token[t].name), line+ofs, xmlStrlen(BAD_CAST(s_token[t].name)))) t++;
                     if (LINE_TOKEN_ID_INVALID!=s_token[t].id) {
                         ti->id=s_token[t].id;
-                        PASSERT(0==xmlStrncmp(_X(s_token[ti->id].name), line+ofs, xmlStrlen(_X(s_token[ti->id].name))));
-                        ofs+=xmlStrlen(_X(s_token[t].name));
+                        PASSERT(0==xmlStrncmp(BAD_CAST(s_token[ti->id].name), line+ofs, xmlStrlen(BAD_CAST(s_token[ti->id].name))));
+                        ofs+=xmlStrlen(BAD_CAST(s_token[t].name));
                         readParam(NULL, line, &ofs, ti->param[0], sizeof(ti->param[0]));
                         if (line[ofs]==',') { ofs++; readParam(sc, line, &ofs, ti->param[1], sizeof(ti->param[1])); }
                         if (line[ofs]==',') { ofs++; readParam(sc, line, &ofs, ti->param[2], sizeof(ti->param[2])); }
                     } else {
         //                printf("UNKOWN TOKEN: %s\n", line);
                     }
-                } else if (0==xmlStrncmp(_X(ns_decl), line, xmlStrlen(_X(ns_decl)))) {
+                } else if (0==xmlStrncmp(BAD_CAST(ns_decl), line, xmlStrlen(BAD_CAST(ns_decl)))) {
                     char prefix[50];
                     char ns[255];
-                    int ofs=xmlStrlen(_X(ns_decl));
+                    int ofs=xmlStrlen(BAD_CAST(ns_decl));
                     int j=0;
                     while(0!=line[ofs] && '['!=line[ofs]) {
                         if (j+2<sizeof(prefix)) {
@@ -332,7 +332,7 @@ LineTokenId_t readLineToken(SourceContext *sc, LineTokenInstance* ti) {
                                 ofs++;
                             }
                             if ('\"'==line[ofs]) {
-                                addBinding(sc, _X(prefix), _X(ns));
+                                addBinding(sc, BAD_CAST(prefix), BAD_CAST(ns));
                             }
                         }
                     }
@@ -354,7 +354,7 @@ LineTokenId_t readLineToken(SourceContext *sc, LineTokenInstance* ti) {
 static void errorToken(SourceContext *sc, LineTokenInstance *ti) {
     printf("ERROR %s(%s, %s, %s)\n", s_token[ti->id].name, ti->param[0], ti->param[1], ti->param[2]);
     ti->id=LINE_TOKEN_ID_EOF;
-    sc->error_flag=PTRUE;
+    sc->error_flag=true;
 }
 
 static pbool_t parseDeclarations(SourceContext *sc, LineTokenInstance *ti, puint32_t def_id);
@@ -365,13 +365,13 @@ static pbool_t parseStartDeclaration(SourceContext *sc, LineTokenInstance *ti, S
                                                                                                    :LINE_TOKEN_ID_START_TEXT==ti->id
                                                                                                    ?LINE_TOKEN_ID_END_TEXT:ti->id);
 
-        SchemaDeclaration *decl=addDecl(decl_array, decl_len, _X(ti->param[1]), _X(ti->param[2]));
+        SchemaDeclaration *decl=addDecl(decl_array, decl_len, BAD_CAST(ti->param[1]), BAD_CAST(ti->param[2]));
         PASSERT(NULL!=decl && -1==decl->def_id);
         readLineToken(sc, ti); // consume start token
         if (LINE_TOKEN_ID_REF==ti->id) {
-            decl->def_id=findDef(sc, _X(ti->param[0]));
+            decl->def_id=findDef(sc, BAD_CAST(ti->param[0]));
             if (-1==decl->def_id) {
-                decl->def_id=addDef(sc, _X(ti->param[0]));
+                decl->def_id=addDef(sc, BAD_CAST(ti->param[0]));
             }
         } else {
             decl->def_id=addDef(sc, NULL);
@@ -383,11 +383,11 @@ static pbool_t parseStartDeclaration(SourceContext *sc, LineTokenInstance *ti, S
             if (end_id==ti->id) {
                 sc->def_array[decl->def_id].max_occurs=PUINT32_MAX;
                 readLineToken(sc, ti); // consume end token
-                return PTRUE;
+                return true;
             }
         }
     }
-    return PFALSE;
+    return false;
 }
 
 static pbool_t parseDeclarations(SourceContext *sc, LineTokenInstance *ti, puint32_t def_id) {
@@ -397,9 +397,9 @@ static pbool_t parseDeclarations(SourceContext *sc, LineTokenInstance *ti, puint
         }
         if (LINE_TOKEN_ID_END_CHILDREN==ti->id) {
             readLineToken(sc, ti); // consume end token
-            return PTRUE;
+            return true;
         } else {
-            return PFALSE;
+            return false;
         }
     } else if (LINE_TOKEN_ID_START_ATTRIBUTES==ti->id) {
         readLineToken(sc, ti); // consume start token
@@ -407,21 +407,21 @@ static pbool_t parseDeclarations(SourceContext *sc, LineTokenInstance *ti, puint
         }
         if (LINE_TOKEN_ID_END_ATTRIBUTES==ti->id) {
             readLineToken(sc, ti); // consume end token
-            return PTRUE;
+            return true;
         } else {
-            return PFALSE;
+            return false;
         }
     } else if (LINE_TOKEN_ID_SKIP_CHILDREN==ti->id) {
         readLineToken(sc, ti); // consume token
-        return PTRUE;
+        return true;
     } else if (LINE_TOKEN_ID_SKIP_ATTRIBUTES==ti->id) {
         readLineToken(sc, ti); // consume token
-        return PTRUE;
+        return true;
     } else if (LINE_TOKEN_ID_REF==ti->id) {
         readLineToken(sc, ti); // consume token
-        return PTRUE;
+        return true;
     } else {
-        return PFALSE;
+        return false;
     }
 }
 
@@ -430,27 +430,27 @@ static pbool_t parseStartDocument(SourceContext *sc, LineTokenInstance *ti) {
     if (LINE_TOKEN_ID_START_DOCUMENT==ti->id) {
         readLineToken(sc, ti); // consume start_document token
         if (parseStartDeclaration(sc, ti, &sc->decl_array, &sc->decl_len)) {
-            return (LINE_TOKEN_ID_END_DOCUMENT==ti->id?LINE_TOKEN_ID_INVALID!=readLineToken(sc, ti):PFALSE); // consume end_document
+            return (LINE_TOKEN_ID_END_DOCUMENT==ti->id?LINE_TOKEN_ID_INVALID!=readLineToken(sc, ti):false); // consume end_document
         }
     } 
-    return PFALSE;
+    return false;
 }
 
 static pbool_t parseDefinition(SourceContext *sc, LineTokenInstance *ti) {
     if (LINE_TOKEN_ID_DEF==ti->id) {
-        puint32_t def_id=findDef(sc, _X(ti->param[0]));
+        puint32_t def_id=findDef(sc, BAD_CAST(ti->param[0]));
         if (-1==def_id) {
-            def_id=addDef(sc, _X(ti->param[0]));
+            def_id=addDef(sc, BAD_CAST(ti->param[0]));
         }
         PASSERT(-1!=def_id);
         readLineToken(sc, ti); // consume def token
         if (def_id>=0 && def_id<sc->def_len) {
             parseDeclarations(sc, ti, def_id); // attributes
             parseDeclarations(sc, ti, def_id); // children
-            return PTRUE;
+            return true;
         }
     } 
-    return PFALSE;
+    return false;
 }
 
 static void dumpDecl(SourceContext *sc, FILE *out, int indent, SchemaDeclaration *decl);
@@ -526,9 +526,9 @@ int main( int argc, const char* argv[] )
     opcInitLibrary();
     SourceContext sc;
     memset(&sc, 0, sizeof(sc));
-    addBinding(&sc, _X("NULL"), _X("*"));
+    addBinding(&sc, BAD_CAST("NULL"), BAD_CAST("*"));
     for(int i=1;i<argc;i++) {
-        parseSourceCode(&sc, _X(argv[i]));
+        parseSourceCode(&sc, BAD_CAST(argv[i]));
     }
     dumpGrammar(&sc, stdout);
     if (NULL!=sc.binding_array) {

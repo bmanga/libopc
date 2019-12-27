@@ -36,6 +36,7 @@ Helper functions needed by mce/textreader.h and mce/textwriter.h to implement MC
 - mceQNameLevelPush() and mceQNameLevelPopIfMatch() maintain a stack of mceQNameLevel_t tuples.
 - mceCtxInit(), mceCtxCleanup() and mceCtxUnderstandsNamespace() manage a context which holds all information needed to do MCE proprocessing.
  */
+#include <config.h>
 
 #ifndef MCE_HELPER_H
 #define MCE_HELPER_H
@@ -123,7 +124,7 @@ extern "C" {
     bool mceQNameLevelAdd(mceQNameLevelSet_t *qname_level_set, const xmlChar *ns, const xmlChar *ln, uint32_t level);
 
     /**
-      Lookup a tiple (ns, ln, level) via \c ns and \c ln. If \c ignore_ln is PTRUE then the first tiple matching \c ns will be returned.
+      Lookup a tiple (ns, ln, level) via \c ns and \c ln. If \c ignore_ln is true then the first tiple matching \c ns will be returned.
     */
     mceQNameLevel_t* mceQNameLevelLookup(mceQNameLevelSet_t *qname_level_set, const xmlChar *ns, const xmlChar *ln, bool ignore_ln);
 

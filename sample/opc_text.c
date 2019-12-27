@@ -40,17 +40,18 @@
 */
 
 
-#include <opc/opc.h>
 #include <stdio.h>
 #include <time.h>
 #ifdef WIN32
 #include <crtdbg.h>
 #endif
 
+#include <opc/opc.h>
+
 static void dumpText(mceTextReader_t *reader) {
     mce_skip_attributes(reader);
     mce_start_children(reader) {
-        mce_start_element(reader, _X("http://schemas.openxmlformats.org/wordprocessingml/2006/main"), _X("t")) {
+        mce_start_element(reader, BAD_CAST("http://schemas.openxmlformats.org/wordprocessingml/2006/main"), BAD_CAST("t")) {
             mce_skip_attributes(reader);
             mce_start_children(reader) {
                 mce_start_text(reader) {
@@ -73,7 +74,7 @@ static void dumpText(mceTextReader_t *reader) {
                 } mce_end_text(reader);
             } mce_end_children(reader);
         } mce_end_element(reader);
-        mce_start_element(reader, _X("http://schemas.openxmlformats.org/wordprocessingml/2006/main"), _X("p")) {
+        mce_start_element(reader, BAD_CAST("http://schemas.openxmlformats.org/wordprocessingml/2006/main"), BAD_CAST("p")) {
             printf("<p>");
             dumpText(reader);
             printf("</p>\n");
@@ -91,10 +92,10 @@ int main( int argc, const char* argv[] )
 #endif
 
     opcInitLibrary();
-    opcContainer *c=opcContainerOpen(_X(argv[1]), OPC_OPEN_READ_ONLY, NULL, NULL);
+    opcContainer *c=opcContainerOpen(BAD_CAST(argv[1]), OPC_OPEN_READ_ONLY, NULL, NULL);
     if (NULL!=c) {
         mceTextReader_t reader;
-        if (OPC_ERROR_NONE==opcXmlReaderOpen(c, &reader, _X("/word/document.xml"), NULL, 0, 0)) {
+        if (OPC_ERROR_NONE==opcXmlReaderOpen(c, &reader, BAD_CAST("/word/document.xml"), NULL, 0, 0)) {
             mce_start_document(&reader) {
                 mce_start_element(&reader, NULL, NULL) {
                     printf("<html>\n");

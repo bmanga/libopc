@@ -33,7 +33,7 @@
 /** @file opc/inputstream.h
  
  */
-#include <opc/config.h>
+#include <config.h>
 
 #ifndef OPC_INPUTSTREAM_H
 #define OPC_INPUTSTREAM_H

@@ -39,7 +39,7 @@
     opc_part OOXMLI1.docx "word/document.xml"
 */
 
-#include <opc/opc.h>
+config.h>/opc.h>
 #include <stdio.h>
 #include <time.h>
 #ifdef WIN32
@@ -52,13 +52,13 @@ int main( int argc, const char* argv[] )
      _CrtSetDbgFlag (_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
     opcInitLibrary();
-    opcContainer *c=opcContainerOpen(_X(argv[1]), OPC_OPEN_READ_ONLY, NULL, NULL);
+    opcContainer *c=opcContainerOpen(BAD_CAST(argv[1]), OPC_OPEN_READ_ONLY, NULL, NULL);
     if (NULL!=c) {
-        opcPart part=opcPartFind(c, _X(argv[2]), NULL, 0);
+        opcPart part=opcPartFind(c, BAD_CAST(argv[2]), NULL, 0);
         if (OPC_PART_INVALID!=part) {
             const xmlChar *type=opcPartGetType(c, part);
             opc_uint32_t type_len=xmlStrlen(type);
-            opc_bool_t is_xml=NULL!=type && type_len>=3 && 'x'==type[type_len-3] && 'm'==type[type_len-2] && 'l'==type[type_len-1];
+            bool is_xml=NULL!=type && type_len>=3 && 'x'==type[type_len-3] && 'm'==type[type_len-2] && 'l'==type[type_len-1];
             fprintf(stderr, "type=%s is_xml=%i\n", type, is_xml);
             if (is_xml) {
                 mceTextReader_t reader;

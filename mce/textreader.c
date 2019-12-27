@@ -47,10 +47,10 @@ int mceTextReaderCleanup(mceTextReader_t *mceTextReader) {
 }
 
 static xmlChar *xmlStrDupArray(const xmlChar *value) {
-    opc_uint32_t len=xmlStrlen(value);
+    uint32_t len=xmlStrlen(value);
     xmlChar *ret=(xmlChar *)xmlMalloc((2+len)*sizeof(xmlChar));
-    opc_uint32_t j=0;
-    for(opc_uint32_t i=0;i<len;i++) {
+    uint32_t j=0;
+    for(uint32_t i=0;i<len;i++) {
         while(i<len && (value[i]==' ' || value[i]=='\t' || value[i]=='\r' || value[i]=='\n')) i++; // skip preceeding spaces
         while(i<len && value[i]!=' ' && value[i]!='\t' && value[i]!='\r' && value[i]!='\n') ret[j++]=value[i++];
         ret[j++]=0;
@@ -60,7 +60,7 @@ static xmlChar *xmlStrDupArray(const xmlChar *value) {
 }
 
 static xmlChar *xmlStrArrayFirst(xmlChar *a, int *entry_len) {
-    PASSERT(NULL!=entry_len);
+    assert(NULL!=entry_len);
     *entry_len=xmlStrlen(a);
     return a;
 }
@@ -70,8 +70,8 @@ static bool xmlStrArrayValid(const xmlChar *e) {
 }
 
 static xmlChar *xmlStrArrayNext(xmlChar *e, int *entry_len) {
-    PASSERT(NULL!=entry_len);
-    PASSERT(xmlStrArrayValid(e));
+    assert(NULL!=entry_len);
+    assert(xmlStrArrayValid(e));
     xmlChar *ret=e+1+*entry_len;
     *entry_len=xmlStrlen(ret);
     return ret;
@@ -80,7 +80,7 @@ static xmlChar *xmlStrArrayNext(xmlChar *e, int *entry_len) {
 void mceRaiseError(xmlTextReader *reader, mceCtx_t *ctx, mceError_t error, const xmlChar *str, ...) {
     va_list args;
     va_start(args, str);
-    PASSERT(MCE_ERROR_NONE==ctx->error); // called twice? why?
+    assert(MCE_ERROR_NONE==ctx->error); // called twice? why?
     ctx->error=error;
     xmlChar buf[1024];
     xmlStrVPrintf(buf, sizeof(buf), str, args);
@@ -128,8 +128,8 @@ static void mceTextReaderProcessAttributes(xmlTextReader *reader, mceCtx_t *ctx,
                         int prefix_len=0;
                         for(xmlChar *prefix=xmlStrArrayFirst(v, &prefix_len);xmlStrArrayValid(prefix);prefix=xmlStrArrayNext(prefix, &prefix_len)) {
                             xmlChar *ns_=xmlTextReaderLookupNamespace(reader, prefix);
-                            if (NULL!=ns_ && NULL==mceQNameLevelLookup(&ctx->understands_set, ns_, NULL, PFALSE)) {
-                                PENSURE(mceQNameLevelAdd(&ctx->ignorable_set, ns_, NULL, level));
+                            if (NULL!=ns_ && NULL==mceQNameLevelLookup(&ctx->understands_set, ns_, NULL, false)) {
+                                assert(mceQNameLevelAdd(&ctx->ignorable_set, ns_, NULL, level));
                             }
                             xmlFree(ns_);
                         }
@@ -140,15 +140,15 @@ static void mceTextReaderProcessAttributes(xmlTextReader *reader, mceCtx_t *ctx,
                         int qname_len=0;
                         for(xmlChar *qname=xmlStrArrayFirst(v, &qname_len);xmlStrArrayValid(qname);qname=xmlStrArrayNext(qname, &qname_len)) {
                             int prefix=0; while(qname[prefix]!=':' && qname[prefix]!=0) prefix++;
-                            OPC_ASSERT(prefix<=qname_len);
+                            assert(prefix<=qname_len);
                             int ln=(prefix<qname_len?prefix+1:0);
                             if (prefix<qname_len) {
                                 qname[prefix]=0;
                                 prefix=0;
                             };
                             xmlChar *ns_=xmlTextReaderLookupNamespace(reader, qname+prefix);
-                            if (NULL!=ns_ && NULL==mceQNameLevelLookup(&ctx->understands_set, ns_, NULL, PFALSE)) {
-                                PENSURE(mceQNameLevelAdd(&ctx->processcontent_set, ns_, xmlStrdup(qname+ln), level));
+                            if (NULL!=ns_ && NULL==mceQNameLevelLookup(&ctx->understands_set, ns_, NULL, false)) {
+                                assert(mceQNameLevelAdd(&ctx->processcontent_set, ns_, xmlStrdup(qname+ln), level));
 
                             }
                         }
@@ -159,20 +159,20 @@ static void mceTextReaderProcessAttributes(xmlTextReader *reader, mceCtx_t *ctx,
                         int prefix_len=0;
                         for(xmlChar *prefix=xmlStrArrayFirst(v, &prefix_len);xmlStrArrayValid(prefix);prefix=xmlStrArrayNext(prefix, &prefix_len)) {
                             xmlChar *ns_=xmlTextReaderLookupNamespace(reader, prefix);
-                            if (NULL!=ns_ && NULL==mceQNameLevelLookup(&ctx->understands_set, ns_, NULL, PFALSE)) {
+                            if (NULL!=ns_ && NULL==mceQNameLevelLookup(&ctx->understands_set, ns_, NULL, false)) {
                                 mceRaiseError(reader, ctx, MCE_ERROR_MUST_UNDERSTAND, BAD_CAST("MustUnderstand namespace \"%s\""), ns_);
                             }
                         }
                         xmlFree(v);
 #if (MCE_NAMESPACE_SUBSUMPTION_ENABLED)
                 } else if (0==xmlStrcmp(BAD_CAST(ns_xml), xmlTextReaderConstNamespaceUri(reader))) {
-                    mceQNameLevel_t *qnl=mceQNameLevelLookup(&ctx->subsume_prefix_set, xmlTextReaderConstValue(reader), NULL, PTRUE);
+                    mceQNameLevel_t *qnl=mceQNameLevelLookup(&ctx->subsume_prefix_set, xmlTextReaderConstValue(reader), NULL, true);
                     if (NULL!=qnl) {
                         const xmlChar *prefix=xmlTextReaderConstLocalName(reader);
                         if (0!=xmlStrcmp(prefix, qnl->ln)) {
                             // different binding!
                             printf("prefix=%s\n", prefix);
-                            PASSERT(0); //@TODO add store prefix for subsumption namespaces...
+                            assert(0); //@TODO add store prefix for subsumption namespaces...
                         }
                     }
                 } else {
@@ -192,21 +192,21 @@ static void mceTextReaderProcessAttributes(xmlTextReader *reader, mceCtx_t *ctx,
                     xmlRemoveProp(remove); remove=NULL;
                 }
                 if (0==xmlStrcmp(BAD_CAST(ns_mce), xmlTextReaderConstNamespaceUri(reader))) {
-                    OPC_ASSERT(XML_ATTRIBUTE_NODE==xmlTextReaderCurrentNode(reader)->type);
+                    assert(XML_ATTRIBUTE_NODE==xmlTextReaderCurrentNode(reader)->type);
                     remove=(xmlAttrPtr)xmlTextReaderCurrentNode(reader);
                 } else if (NULL!=mceQNameLevelLookup(&ctx->ignorable_set,
                     xmlTextReaderConstNamespaceUri(reader), 
                     NULL, 
-                    PFALSE)) {
-                        OPC_ASSERT(XML_ATTRIBUTE_NODE==xmlTextReaderCurrentNode(reader)->type);
+                    false)) {
+                        assert(XML_ATTRIBUTE_NODE==xmlTextReaderCurrentNode(reader)->type);
                         remove=(xmlAttrPtr)xmlTextReaderCurrentNode(reader);
                 }
             } while (1==xmlTextReaderMoveToNextAttribute(reader));
-            OPC_ENSURE(1==xmlTextReaderMoveToElement(reader));
+            assert(1==xmlTextReaderMoveToElement(reader));
             if (NULL!=remove) {
                 xmlRemoveProp(remove); remove=NULL;
             }
-            OPC_ASSERT(NULL==remove);
+            assert(NULL==remove);
 
         }
     }
@@ -221,10 +221,10 @@ static bool mceTextReaderProcessStartElement(xmlTextReader *reader, mceCtx_t *ct
             xmlChar *req_ns=NULL;
             if (1==xmlTextReaderMoveToAttribute(reader, BAD_CAST("Requires"))) {
                 req_ns=xmlTextReaderLookupNamespace(reader, xmlTextReaderConstValue(reader));
-                OPC_ENSURE(1==xmlTextReaderMoveToElement(reader));
+                assert(1==xmlTextReaderMoveToElement(reader));
             } else if (1==xmlTextReaderMoveToAttributeNs(reader, BAD_CAST("Requires"), BAD_CAST(ns_mce))) {
                 req_ns=xmlTextReaderLookupNamespace(reader, xmlTextReaderConstValue(reader));
-                OPC_ENSURE(1==xmlTextReaderMoveToElement(reader));
+                assert(1==xmlTextReaderMoveToElement(reader));
             }
             if (NULL==req_ns) {
                 mceRaiseError(reader, ctx, MCE_ERROR_XML, BAD_CAST("Missing \"Requires\" attribute"));
@@ -233,11 +233,11 @@ static bool mceTextReaderProcessStartElement(xmlTextReader *reader, mceCtx_t *ct
                    || mceSkipStackTop(&ctx->skip_stack)->level_start+1!=level
                    || mceSkipStackTop(&ctx->skip_stack)->level_end!=level) {
                 mceRaiseError(reader, ctx, MCE_ERROR_XML, BAD_CAST("Choice element does not appear at a valid position."));
-            } else if (mceQNameLevelLookup(&ctx->understands_set, req_ns, NULL, PFALSE) && mceSkipStackTop(&ctx->skip_stack)->state!=MCE_SKIP_STATE_CHOICE_MATCHED) {
+            } else if (mceQNameLevelLookup(&ctx->understands_set, req_ns, NULL, false) && mceSkipStackTop(&ctx->skip_stack)->state!=MCE_SKIP_STATE_CHOICE_MATCHED) {
                 mceSkipStackTop(&ctx->skip_stack)->state=MCE_SKIP_STATE_CHOICE_MATCHED;
                 mceSkipStackPush(&ctx->skip_stack, level, level+1, MCE_SKIP_STATE_IGNORE);
             } else {
-                mceSkipStackPush(&ctx->skip_stack, level, PUINT32_MAX, MCE_SKIP_STATE_IGNORE);
+                mceSkipStackPush(&ctx->skip_stack, level, UINT32_MAX, MCE_SKIP_STATE_IGNORE);
             }
             if (NULL!=req_ns) xmlFree(req_ns);
         } else if (0==xmlStrcmp(BAD_CAST(ns_mce), ns) && 0==xmlStrcmp(BAD_CAST("Fallback"), ln)) {
@@ -249,14 +249,14 @@ static bool mceTextReaderProcessStartElement(xmlTextReader *reader, mceCtx_t *ct
             } else if (mceSkipStackTop(&ctx->skip_stack)->state!=MCE_SKIP_STATE_CHOICE_MATCHED) {
                 mceSkipStackPush(&ctx->skip_stack, level, level+1, MCE_SKIP_STATE_IGNORE);
             } else {
-                mceSkipStackPush(&ctx->skip_stack, level, PUINT32_MAX, MCE_SKIP_STATE_IGNORE);
+                mceSkipStackPush(&ctx->skip_stack, level, UINT32_MAX, MCE_SKIP_STATE_IGNORE);
             }
-        } else if (mceQNameLevelLookup(&ctx->ignorable_set, ns, NULL, PFALSE)
-            && !mceQNameLevelLookup(&ctx->understands_set, ns, NULL, PFALSE)) {
-                if (mceQNameLevelLookup(&ctx->processcontent_set, ns, ln, PFALSE)) {
+        } else if (mceQNameLevelLookup(&ctx->ignorable_set, ns, NULL, false)
+            && !mceQNameLevelLookup(&ctx->understands_set, ns, NULL, false)) {
+                if (mceQNameLevelLookup(&ctx->processcontent_set, ns, ln, false)) {
                     mceSkipStackPush(&ctx->skip_stack, level, level+1, MCE_SKIP_STATE_IGNORE);
                 } else {
-                    mceSkipStackPush(&ctx->skip_stack, level, PUINT32_MAX, MCE_SKIP_STATE_IGNORE);
+                    mceSkipStackPush(&ctx->skip_stack, level, UINT32_MAX, MCE_SKIP_STATE_IGNORE);
                 }
         }
     }
@@ -264,15 +264,15 @@ static bool mceTextReaderProcessStartElement(xmlTextReader *reader, mceCtx_t *ct
 }
 
 static bool mceTextReaderProcessEndElement(xmlTextReader *reader, mceCtx_t *ctx, uint32_t level, const xmlChar *ns, const xmlChar *ln) {
-    bool skiped=PFALSE;
+    bool skiped=false;
     if (mceSkipStackSkip(&ctx->skip_stack, level)) {
         if (mceSkipStackTop(&ctx->skip_stack)->level_start==level) {
             mceSkipStackPop(&ctx->skip_stack);
         } else if (mceSkipStackTop(&ctx->skip_stack)->level_end==level) {
             mceSkipStackTop(&ctx->skip_stack)->level_end--;
-            PASSERT(mceSkipStackTop(&ctx->skip_stack)->level_start<mceSkipStackTop(&ctx->skip_stack)->level_end);
+            assert(mceSkipStackTop(&ctx->skip_stack)->level_start<mceSkipStackTop(&ctx->skip_stack)->level_end);
         }
-        skiped=PTRUE;
+        skiped=true;
     }
     mceQNameLevelCleanup(&ctx->ignorable_set, level);
     mceQNameLevelCleanup(&ctx->processcontent_set, level);
@@ -291,14 +291,14 @@ int mceTextReaderPostprocess(xmlTextReader *reader, mceCtx_t *ctx, int ret) {
         ns=xmlTextReaderConstNamespaceUri(reader);
         ln=xmlTextReaderConstLocalName(reader);
         if (XML_READER_TYPE_ELEMENT==xmlTextReaderNodeType(reader)) {
-            if (ctx->suspended_level>0 || NULL!=mceQNameLevelLookup(&ctx->suspended_set, ns, ln, PFALSE)) {
-                suspend=PTRUE;
+            if (ctx->suspended_level>0 || NULL!=mceQNameLevelLookup(&ctx->suspended_set, ns, ln, false)) {
+                suspend=true;
                 if (!xmlTextReaderIsEmptyElement(reader)) {
                     ctx->suspended_level++;
                 }
             }
         } else if (ctx->suspended_level>0) {
-            suspend=PTRUE;
+            suspend=true;
             if (XML_READER_TYPE_END_ELEMENT==xmlTextReaderNodeType(reader)) {
                 ctx->suspended_level--;
             }
@@ -309,7 +309,7 @@ int mceTextReaderPostprocess(xmlTextReader *reader, mceCtx_t *ctx, int ret) {
         if (XML_READER_TYPE_ELEMENT==xmlTextReaderNodeType(reader)) {
             skip=mceTextReaderProcessStartElement(reader, ctx, xmlTextReaderDepth(reader), ns, ln);
             if (xmlTextReaderIsEmptyElement(reader)) {
-                PENSURE(mceTextReaderProcessEndElement(reader, ctx, xmlTextReaderDepth(reader), ns, ln)==skip);
+                assert(mceTextReaderProcessEndElement(reader, ctx, xmlTextReaderDepth(reader), ns, ln)==skip);
             }
         } else if (XML_READER_TYPE_END_ELEMENT==xmlTextReaderNodeType(reader)) {
             skip=mceTextReaderProcessEndElement(reader, ctx, xmlTextReaderDepth(reader), ns, ln);
@@ -377,14 +377,14 @@ int mceTextReaderDump(mceTextReader_t *mceTextReader, xmlTextWriter *writer, boo
                     }
                 } while (1==xmlTextReaderMoveToNextAttribute(mceTextReader->reader));
             }
-            PENSURE(1==xmlTextReaderMoveToElement(mceTextReader->reader));
+            assert(1==xmlTextReaderMoveToElement(mceTextReader->reader));
         }
         if (!xmlTextReaderIsEmptyElement(mceTextReader->reader)) {
             ret=mceTextReaderRead(mceTextReader); // read start element
             while (1==ret && XML_READER_TYPE_END_ELEMENT!=xmlTextReaderNodeType(mceTextReader->reader)) {
                 ret=mceTextReaderDump(mceTextReader, writer, fragment);
             }
-            PASSERT(-1==ret || XML_READER_TYPE_END_ELEMENT==xmlTextReaderNodeType(mceTextReader->reader));
+            assert(-1==ret || XML_READER_TYPE_END_ELEMENT==xmlTextReaderNodeType(mceTextReader->reader));
             ret=mceTextReaderRead(mceTextReader); // read end element
         } else {
             ret=mceTextReaderRead(mceTextReader); // read empty element

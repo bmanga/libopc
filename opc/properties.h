@@ -33,7 +33,7 @@
 /** @file opc/properties.h
  
  */
-#include <opc/config.h>
+#include <config.h>
 #include <opc/container.h>
 
 #ifndef OPC_PROPERTIES_H

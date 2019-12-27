@@ -39,7 +39,7 @@
     opc_properties OOXMLI1.docx
 */
 
-#include <opc/opc.h>
+config.h>/opc.h>
 #include <stdio.h>
 #include <time.h>
 #ifdef WIN32
@@ -67,13 +67,13 @@ int main( int argc, const char* argv[] )
     opc_error_t err=OPC_ERROR_NONE;
     if (OPC_ERROR_NONE==opcInitLibrary() && 2==argc) {
         opcContainer *c=NULL;
-        if (NULL!=(c=opcContainerOpen(_X(argv[1]), OPC_OPEN_READ_WRITE, NULL, NULL))) {
+        if (NULL!=(c=opcContainerOpen(BAD_CAST(argv[1]), OPC_OPEN_READ_WRITE, NULL, NULL))) {
             opcProperties_t cp;
             opcCorePropertiesInit(&cp);
             opcCorePropertiesRead(&cp, c);
-//            opcCorePropertiesSetString(&cp.category, _X("category"));
-//            opcCorePropertiesSetString(&cp.contentStatus, _X("contentStatus"));
-//            opcCorePropertiesSetString(&cp.created, _X("2011-04-13T06:24:00Z"));
+//            opcCorePropertiesSetString(&cp.category, BAD_CAST("category"));
+//            opcCorePropertiesSetString(&cp.contentStatus, BAD_CAST("contentStatus"));
+//            opcCorePropertiesSetString(&cp.created, BAD_CAST("2011-04-13T06:24:00Z"));
 
             if (NULL!=cp.category) printf("category=\"%s\"\n", cp.category);
             if (NULL!=cp.contentStatus) printf("contentStatus=\"%s\"\n", cp.contentStatus);

@@ -41,7 +41,6 @@
     opc_image OOXMLI1.docx C:\Users\flr\Pictures
 */
 
-#include <opc/opc.h>
 #include <stdio.h>
 #include <time.h>
 #ifdef WIN32
@@ -76,14 +75,14 @@ int main( int argc, const char* argv[] )
      _CrtSetDbgFlag (_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
     opcInitLibrary();
-    opcContainer *c=opcContainerOpen(_X(argv[1]), OPC_OPEN_READ_ONLY, NULL, NULL);
+    opcContainer *c=opcContainerOpen(BAD_CAST(argv[1]), OPC_OPEN_READ_ONLY, NULL, NULL);
     const char *path=(argc>1?argv[2]:"");
     if (NULL!=c) {
         for(opcPart part=opcPartGetFirst(c);OPC_PART_INVALID!=part;part=opcPartGetNext(c, part)) {
             const xmlChar *type=opcPartGetType(c, part);
-            if (xmlStrcmp(type, _X("image/jpeg"))==0) {
+            if (xmlStrcmp(type, BAD_CAST("image/jpeg"))==0) {
                 extract(c, part, path);
-            } else if (xmlStrcmp(type, _X("image/png"))==0) {
+            } else if (xmlStrcmp(type, BAD_CAST("image/png"))==0) {
                 extract(c, part, path);
             } else {
                 printf("skipped %s of type %s\n", part, type);

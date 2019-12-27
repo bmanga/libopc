@@ -39,7 +39,7 @@
     opc_xml OOXMLI1.docx "word/document.xml"
 */
 
-#include <opc/opc.h>
+config.h>/opc.h>
 #include <stdio.h>
 #include <time.h>
 #ifdef WIN32
@@ -71,10 +71,10 @@ int main( int argc, const char* argv[] )
     time_t start_time=time(NULL);
     if (OPC_ERROR_NONE==opcInitLibrary() && 3==argc) {
         opcContainer *c=NULL;
-        if (NULL!=(c=opcContainerOpen(_X(argv[1]), OPC_OPEN_READ_ONLY, NULL, NULL))) {
+        if (NULL!=(c=opcContainerOpen(BAD_CAST(argv[1]), OPC_OPEN_READ_ONLY, NULL, NULL))) {
             opcContainerDump(c, stdout);
             mceTextReader_t reader;
-            if (OPC_ERROR_NONE==opcXmlReaderOpen(c, &reader,  _X(argv[2]), NULL, 0, 0)) {
+            if (OPC_ERROR_NONE==opcXmlReaderOpen(c, &reader,  BAD_CAST(argv[2]), NULL, 0, 0)) {
                 mce_start_document(&reader) {
                     mce_start_element(&reader, NULL, NULL) {
                         mce_ref(dumpElement(&reader));

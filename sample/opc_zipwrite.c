@@ -30,7 +30,7 @@
  OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <opc/opc.h>
+config.h>/opc.h>
 #include <stdio.h>
 #include <time.h>
 #ifdef WIN32
@@ -86,7 +86,7 @@ int main( int argc, const char* argv[] )
     if (OPC_ERROR_NONE==(err=opcInitLibrary())) {
         if (argc>0) {
             opcIO_t io;
-            if (OPC_ERROR_NONE==opcFileInitIOFile(&io, _X(argv[1]), OPC_FILE_READ | OPC_FILE_WRITE)) {
+            if (OPC_ERROR_NONE==opcFileInitIOFile(&io, BAD_CAST(argv[1]), OPC_FILE_READ | OPC_FILE_WRITE)) {
                 opcZip *zip=opcZipCreate(&io);
                 if (NULL!=zip) {
                     for(int i=2;i<argc;i++) {
@@ -100,22 +100,22 @@ int main( int argc, const char* argv[] )
                             }
                         } else if (0==strcmp(argv[i], "--add")) { // add sample streams
                             static char txt[]="Hello World!";
-                            opc_uint32_t segment1_id=opcZipCreateSegment(zip, xmlStrdup(_X("hello.txt")), OPC_FALSE, 47+5, 0, 0, 0);
-                            opc_uint32_t segment2_id=opcZipCreateSegment(zip, xmlStrdup(_X("stream.txt")), OPC_FALSE, 47+5, 0, 8, 6);
+                            opc_uint32_t segment1_id=opcZipCreateSegment(zip, xmlStrdup(BAD_CAST("hello.txt")), false, 47+5, 0, 0, 0);
+                            opc_uint32_t segment2_id=opcZipCreateSegment(zip, xmlStrdup(BAD_CAST("stream.txt")), false, 47+5, 0, 8, 6);
                             if (-1!=segment1_id) {
                                 opcZipOutputStream *out=opcZipOpenOutputStream(zip, &segment1_id);
-                                OPC_ENSURE(opcZipWriteOutputStream(zip, out, _X(txt), strlen(txt))==strlen(txt));
+                                OPC_ENSURE(opcZipWriteOutputStream(zip, out, BAD_CAST(txt), strlen(txt))==strlen(txt));
                                 OPC_ENSURE(OPC_ERROR_NONE==opcZipCloseOutputStream(zip, out, &segment1_id));
                             }
                             if (-1!=segment2_id) {
                                 opcZipOutputStream *out=opcZipOpenOutputStream(zip, &segment2_id);
-                                OPC_ENSURE(opcZipWriteOutputStream(zip, out, _X(txt), strlen(txt))==strlen(txt));
+                                OPC_ENSURE(opcZipWriteOutputStream(zip, out, BAD_CAST(txt), strlen(txt))==strlen(txt));
                                 OPC_ENSURE(OPC_ERROR_NONE==opcZipCloseOutputStream(zip, out, &segment2_id));
                             }
                         } else if (0==strcmp(argv[i], "--commit")) { // commit 
-                            OPC_ENSURE(OPC_ERROR_NONE==opcZipCommit(zip, OPC_FALSE));
+                            OPC_ENSURE(OPC_ERROR_NONE==opcZipCommit(zip, false));
                         } else if (0==strcmp(argv[i], "--trim")) { // commit and trim
-                            OPC_ENSURE(OPC_ERROR_NONE==opcZipCommit(zip, OPC_TRUE));
+                            OPC_ENSURE(OPC_ERROR_NONE==opcZipCommit(zip, true));
                         }
                     }
                     opcZipClose(zip, releaseSegment);

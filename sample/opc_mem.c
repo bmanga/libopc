@@ -38,7 +38,7 @@
     Sample:
     opc_mem OOXMLI1.docx
 */
-#include <opc/opc.h>
+config.h>/opc.h>
 #include <stdio.h>
 #include <time.h>
 #ifdef WIN32

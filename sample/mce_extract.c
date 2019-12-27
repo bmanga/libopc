@@ -39,7 +39,7 @@
     opc_xml OOXMLI1.docx "word/document.xml"
 */
 
-#include <opc/opc.h>
+#include <config.h>
 #include <stdio.h>
 #include <time.h>
 #include <libxml/xmlwriter.h>
@@ -47,6 +47,8 @@
 #include <crtdbg.h>
 #endif
 
+
+#include <opc/opc.h>
 
 static int  xmlOutputWrite(void * context, const char * buffer, int len) {
     FILE *out=(FILE*)context;
@@ -84,21 +86,21 @@ int main( int argc, const char* argv[] )
     const xmlChar *partName8=NULL;
     xmlTextWriter *writer=NULL;
     int writer_indent=0;
-    opc_bool_t reader_mce=OPC_TRUE;
+    bool reader_mce=true;
     for(int i=1;i<argc;i++) {
-        if ((0==xmlStrcmp(_X("--understands"), _X(argv[i])) || 0==xmlStrcmp(_X("-u"), _X(argv[i]))) && i+1<argc) {
+        if ((0==xmlStrcmp(BAD_CAST("--understands"), BAD_CAST(argv[i])) || 0==xmlStrcmp(BAD_CAST("-u"), BAD_CAST(argv[i]))) && i+1<argc) {
 	    i++; // skip namespace, registered later when parser was created.
-        } else if ((0==xmlStrcmp(_X("--out"), _X(argv[i])) || 0==xmlStrcmp(_X("--out"), _X(argv[i]))) && i+1<argc && NULL==file) {
+        } else if ((0==xmlStrcmp(BAD_CAST("--out"), BAD_CAST(argv[i])) || 0==xmlStrcmp(BAD_CAST("--out"), BAD_CAST(argv[i]))) && i+1<argc && NULL==file) {
             const char *filename=argv[++i];
             file=fopen(filename, "w");
-        } else if (0==xmlStrcmp(_X("--indent"), _X(argv[i]))) {
+        } else if (0==xmlStrcmp(BAD_CAST("--indent"), BAD_CAST(argv[i]))) {
             writer_indent=1;
-        } else if (0==xmlStrcmp(_X("--raw"), _X(argv[i]))) {
-            reader_mce=OPC_FALSE;
+        } else if (0==xmlStrcmp(BAD_CAST("--raw"), BAD_CAST(argv[i]))) {
+            reader_mce=false;
         } else if (NULL==containerPath8) {
-            containerPath8=_X(argv[i]);
+            containerPath8=BAD_CAST(argv[i]);
         } else if (NULL==partName8) {
-            partName8=_X(argv[i]);
+            partName8=BAD_CAST(argv[i]);
         } else {
             fprintf(stderr, "IGNORED: %s\n", argv[i]);
         }
@@ -130,13 +132,13 @@ int main( int argc, const char* argv[] )
                     if (OPC_ERROR_NONE==opcXmlReaderOpen(c, &reader, part, NULL, NULL, 0)) {
                         mceTextReaderDisableMCE(&reader, !reader_mce);
                         for(int i=1;i<argc;i++) {
-                            if ((0==xmlStrcmp(_X("--understands"), _X(argv[i])) || 0==xmlStrcmp(_X("-u"), _X(argv[i]))) && i+1<argc) {
-                                const xmlChar *ns=_X(argv[++i]);
+                            if ((0==xmlStrcmp(BAD_CAST("--understands"), BAD_CAST(argv[i])) || 0==xmlStrcmp(BAD_CAST("-u"), BAD_CAST(argv[i]))) && i+1<argc) {
+                                const xmlChar *ns=BAD_CAST(argv[++i]);
                                 mceTextReaderUnderstandsNamespace(&reader, ns);
                             }
                         }
 
-                        if (-1==mceTextReaderDump(&reader, writer, PTRUE)) {
+                        if (-1==mceTextReaderDump(&reader, writer, true)) {
                             ret=mceTextReaderGetError(&reader);
                         } else {
                             ret=0;

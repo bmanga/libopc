@@ -38,10 +38,11 @@
     Sample:
     opc_type OOXMLI1.docx
 */
-#include <opc/opc.h>
 #ifdef WIN32
 #include <crtdbg.h>
 #endif
+
+#include <opc/opc.h>
 
 int main( int argc, const char* argv[] )
 {
@@ -51,18 +52,18 @@ int main( int argc, const char* argv[] )
 
     opcInitLibrary();
     for(int i=1;i<argc;i++) {
-        opcContainer *c=opcContainerOpen(_X(argv[1]), OPC_OPEN_READ_ONLY, NULL, NULL);
-        opcRelation rel=opcRelationFind(c, OPC_PART_INVALID, NULL, _X("http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument"));
+        opcContainer *c=opcContainerOpen(BAD_CAST(argv[1]), OPC_OPEN_READ_ONLY, NULL, NULL);
+        opcRelation rel=opcRelationFind(c, OPC_PART_INVALID, NULL, BAD_CAST("http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument"));
         if (OPC_RELATION_INVALID!=rel) {
             opcPart mainPart=opcRelationGetInternalTarget(c, OPC_PART_INVALID, rel);
             if (OPC_PART_INVALID!=mainPart) {
                 const xmlChar *type=opcPartGetType(c, mainPart);
                 printf("Office Document Type: %s\n", type);
-                if (0==xmlStrcmp(type, _X("application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"))) {
+                if (0==xmlStrcmp(type, BAD_CAST("application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"))) {
                     printf("WORD Document\n");
-                } else if (0==xmlStrcmp(type, _X("application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml"))) {
+                } else if (0==xmlStrcmp(type, BAD_CAST("application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml"))) {
                     printf("POWERPOINT Document\n");
-                } else if (0==xmlStrcmp(type, _X("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"))) {
+                } else if (0==xmlStrcmp(type, BAD_CAST("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"))) {
                     printf("EXCEL Document\n");
                 }
             }

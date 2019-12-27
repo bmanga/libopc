@@ -29,12 +29,13 @@
  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED 
  OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#include <opc/opc.h>
 #include <mce/textwriter.h>
 #include <stdio.h>
 #ifdef WIN32
 #include <crtdbg.h>
 #endif
+
+#include <opc/opc.h>
 
 const char v1_ns[]="http://schemas.openxmlformats.org/Circles/v1";
 const char v2_ns[]="http://schemas.openxmlformats.org/Circles/v2";
@@ -68,48 +69,48 @@ int main( int argc, const char* argv[] )
 #endif
     if (OPC_ERROR_NONE==opcInitLibrary()) {
         if (2==argc) {
-            opcContainer *c=opcContainerOpen(_X(argv[1]), OPC_OPEN_WRITE_ONLY, NULL, NULL);
-            opcExtensionRegister(c, _X("xml"), _X("text/xml"));
-            opcPart part=opcPartCreate(c, _X("sample.xml"), NULL, 0);
+            opcContainer *c=opcContainerOpen(BAD_CAST(argv[1]), OPC_OPEN_WRITE_ONLY, NULL, NULL);
+            opcExtensionRegister(c, BAD_CAST("xml"), BAD_CAST("text/xml"));
+            opcPart part=opcPartCreate(c, BAD_CAST("sample.xml"), NULL, 0);
             mceTextWriter *w=mceTextWriterOpen(c, part, OPC_COMPRESSIONOPTION_FAST);
             mceTextWriterStartDocument(w);
-            mceTextWriterRegisterNamespace(w, _X(v1_ns), NULL, MCE_DEFAULT);
-            mceTextWriterRegisterNamespace(w, _X(v2_ns), _X("v2"), MCE_IGNORABLE);
-            mceTextWriterProcessContent(w, _X(v2_ns), _X("Blink"));
-            mceTextWriterStartElement(w, _X(v1_ns), _X("Circles"));
-            mceTextWriterStartElement(w, _X(v2_ns), _X("Watermark"));
-            mceTextWriterAttributeF(w, _X(v1_ns), _X("Opacity"), "v0.1");    
-            mceTextWriterStartElement(w, _X(v1_ns), _X("Circle"));
-            mceTextWriterAttributeF(w, _X(v1_ns), _X("Center"), "0,0");
-            mceTextWriterAttributeF(w, _X(v1_ns), _X("Radius"), "20");
-            mceTextWriterAttributeF(w, _X(v1_ns), _X("Color"), "Blue");
-            mceTextWriterEndElement(w, _X(v1_ns), _X("Circle"));
-            mceTextWriterStartElement(w, _X(v1_ns), _X("Circle"));
-            mceTextWriterAttributeF(w, _X(v1_ns), _X("Center"), "25,0");
-            mceTextWriterAttributeF(w, _X(v1_ns), _X("Radius"), "20");
-            mceTextWriterAttributeF(w, _X(v1_ns), _X("Color"), "Black");
-            mceTextWriterEndElement(w, _X(v1_ns), _X("Circle"));
-            mceTextWriterStartElement(w, _X(v1_ns), _X("Circle"));
-            mceTextWriterAttributeF(w, _X(v1_ns), _X("Center"), "50,0");
-            mceTextWriterAttributeF(w, _X(v1_ns), _X("Radius"), "20");
-            mceTextWriterAttributeF(w, _X(v1_ns), _X("Color"), "Red");
-            mceTextWriterEndElement(w, _X(v1_ns), _X("Circle"));
-            mceTextWriterEndElement(w, _X(v2_ns), _X("Watermark"));
+            mceTextWriterRegisterNamespace(w, BAD_CAST(v1_ns), NULL, MCE_DEFAULT);
+            mceTextWriterRegisterNamespace(w, BAD_CAST(v2_ns), BAD_CAST("v2"), MCE_IGNORABLE);
+            mceTextWriterProcessContent(w, BAD_CAST(v2_ns), BAD_CAST("Blink"));
+            mceTextWriterStartElement(w, BAD_CAST(v1_ns), BAD_CAST("Circles"));
+            mceTextWriterStartElement(w, BAD_CAST(v2_ns), BAD_CAST("Watermark"));
+            mceTextWriterAttributeF(w, BAD_CAST(v1_ns), BAD_CAST("Opacity"), "v0.1");    
+            mceTextWriterStartElement(w, BAD_CAST(v1_ns), BAD_CAST("Circle"));
+            mceTextWriterAttributeF(w, BAD_CAST(v1_ns), BAD_CAST("Center"), "0,0");
+            mceTextWriterAttributeF(w, BAD_CAST(v1_ns), BAD_CAST("Radius"), "20");
+            mceTextWriterAttributeF(w, BAD_CAST(v1_ns), BAD_CAST("Color"), "Blue");
+            mceTextWriterEndElement(w, BAD_CAST(v1_ns), BAD_CAST("Circle"));
+            mceTextWriterStartElement(w, BAD_CAST(v1_ns), BAD_CAST("Circle"));
+            mceTextWriterAttributeF(w, BAD_CAST(v1_ns), BAD_CAST("Center"), "25,0");
+            mceTextWriterAttributeF(w, BAD_CAST(v1_ns), BAD_CAST("Radius"), "20");
+            mceTextWriterAttributeF(w, BAD_CAST(v1_ns), BAD_CAST("Color"), "Black");
+            mceTextWriterEndElement(w, BAD_CAST(v1_ns), BAD_CAST("Circle"));
+            mceTextWriterStartElement(w, BAD_CAST(v1_ns), BAD_CAST("Circle"));
+            mceTextWriterAttributeF(w, BAD_CAST(v1_ns), BAD_CAST("Center"), "50,0");
+            mceTextWriterAttributeF(w, BAD_CAST(v1_ns), BAD_CAST("Radius"), "20");
+            mceTextWriterAttributeF(w, BAD_CAST(v1_ns), BAD_CAST("Color"), "Red");
+            mceTextWriterEndElement(w, BAD_CAST(v1_ns), BAD_CAST("Circle"));
+            mceTextWriterEndElement(w, BAD_CAST(v2_ns), BAD_CAST("Watermark"));
 
-            mceTextWriterStartElement(w, _X(v2_ns), _X("Blink"));
-            mceTextWriterStartElement(w, _X(v1_ns), _X("Circle"));
-            mceTextWriterAttributeF(w, _X(v1_ns), _X("Center"), "13,0");
-            mceTextWriterAttributeF(w, _X(v1_ns), _X("Radius"), "20");
-            mceTextWriterAttributeF(w, _X(v1_ns), _X("Color"), "Yellow");
-            mceTextWriterEndElement(w, _X(v1_ns), _X("Circle"));
-            mceTextWriterStartElement(w, _X(v1_ns), _X("Circle"));
-            mceTextWriterAttributeF(w, _X(v1_ns), _X("Center"), "38,0");
-            mceTextWriterAttributeF(w, _X(v1_ns), _X("Radius"), "20");
-            mceTextWriterAttributeF(w, _X(v1_ns), _X("Color"), "Green");
-            mceTextWriterEndElement(w, _X(v1_ns), _X("Circle"));
-            mceTextWriterEndElement(w, _X(v2_ns), _X("Blink")); 
+            mceTextWriterStartElement(w, BAD_CAST(v2_ns), BAD_CAST("Blink"));
+            mceTextWriterStartElement(w, BAD_CAST(v1_ns), BAD_CAST("Circle"));
+            mceTextWriterAttributeF(w, BAD_CAST(v1_ns), BAD_CAST("Center"), "13,0");
+            mceTextWriterAttributeF(w, BAD_CAST(v1_ns), BAD_CAST("Radius"), "20");
+            mceTextWriterAttributeF(w, BAD_CAST(v1_ns), BAD_CAST("Color"), "Yellow");
+            mceTextWriterEndElement(w, BAD_CAST(v1_ns), BAD_CAST("Circle"));
+            mceTextWriterStartElement(w, BAD_CAST(v1_ns), BAD_CAST("Circle"));
+            mceTextWriterAttributeF(w, BAD_CAST(v1_ns), BAD_CAST("Center"), "38,0");
+            mceTextWriterAttributeF(w, BAD_CAST(v1_ns), BAD_CAST("Radius"), "20");
+            mceTextWriterAttributeF(w, BAD_CAST(v1_ns), BAD_CAST("Color"), "Green");
+            mceTextWriterEndElement(w, BAD_CAST(v1_ns), BAD_CAST("Circle"));
+            mceTextWriterEndElement(w, BAD_CAST(v2_ns), BAD_CAST("Blink")); 
                 
-            mceTextWriterEndElement(w, _X(v1_ns), _X("Circles"));
+            mceTextWriterEndElement(w, BAD_CAST(v1_ns), BAD_CAST("Circles"));
             mceTextWriterEndDocument(w);
             mceTextWriterFree(w);
             opcContainerClose(c, OPC_CLOSE_NOW);

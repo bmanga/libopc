@@ -75,13 +75,13 @@ int mceTextWriterFree(mceTextWriter *w) {
 int mceTextWriterStartDocument(mceTextWriter *w) {
     int ret=0;
     ret=xmlTextWriterStartDocument(w->writer, NULL, NULL, NULL);
-    PASSERT(0==w->level);
+    assert(0==w->level);
     return ret;
 }
 
 int mceTextWriterEndDocument(mceTextWriter *w) {
     int ret=0;
-    PASSERT(0==w->level);
+    assert(0==w->level);
     mceQNameLevelCleanup(&w->registered_set, w->level);
     ret=xmlTextWriterEndDocument(w->writer);
     return ret;
@@ -89,8 +89,8 @@ int mceTextWriterEndDocument(mceTextWriter *w) {
 
 int mceTextWriterStartElement(mceTextWriter *w, const xmlChar *ns, const xmlChar *ln) {
     int ret=0;
-    PASSERT(w->level>=w->registered_set.max_level);
-    mceQNameLevel_t* qName=mceQNameLevelLookup(&w->registered_set, ns, NULL, PTRUE);
+    assert(w->level>=w->registered_set.max_level);
+    mceQNameLevel_t* qName=mceQNameLevelLookup(&w->registered_set, ns, NULL, true);
     if (NULL!=qName) {
         if (NULL==qName->ln) {
             ret=xmlTextWriterStartElement(w->writer, ln);
@@ -120,8 +120,8 @@ int mceTextWriterStartElement(mceTextWriter *w, const xmlChar *ns, const xmlChar
                 }
             }
             if (ignorables>0) {
-                mceQNameLevel_t* mceQName=mceQNameLevelLookup(&w->registered_set, w->ns_mce, NULL, PTRUE);
-                PASSERT(NULL!=mceQName);
+                mceQNameLevel_t* mceQName=mceQNameLevelLookup(&w->registered_set, w->ns_mce, NULL, true);
+                assert(NULL!=mceQName);
                 if (NULL!=mceQName) {
                     xmlTextWriterStartAttributeNS(w->writer,
                                                   mceQName->ln,
@@ -136,7 +136,7 @@ int mceTextWriterStartElement(mceTextWriter *w, const xmlChar *ns, const xmlChar
                             }
                         }
                     }
-                    PASSERT(j==ignorables);
+                    assert(j==ignorables);
                     xmlTextWriterEndAttribute(w->writer);
                 }
             }
@@ -147,21 +147,21 @@ int mceTextWriterStartElement(mceTextWriter *w, const xmlChar *ns, const xmlChar
             xmlChar *v=NULL;
             for(uint32_t i=0;i<w->processcontent_set.list_items;i++) {
                 if (w->processcontent_set.list_array[i].level==w->level) {
-                    mceQNameLevel_t* qName=mceQNameLevelLookup(&w->registered_set, w->processcontent_set.list_array[i].ns, NULL, PTRUE);
-                    PASSERT(NULL!=qName); // namespace not registered?
+                    mceQNameLevel_t* qName=mceQNameLevelLookup(&w->registered_set, w->processcontent_set.list_array[i].ns, NULL, true);
+                    assert(NULL!=qName); // namespace not registered?
                     if (NULL!=qName) {
                         uint32_t len=(v_len>0?xmlStrlen(BAD_CAST(" ")):0)+xmlStrlen(qName->ln)+xmlStrlen(BAD_CAST(":"))+xmlStrlen(w->processcontent_set.list_array[i].ln)+1;
                         v=(xmlChar *)xmlRealloc(v, v_len+len);
                         if (v_len>0) { v[v_len++]=' '; len--; }
                         int l=xmlStrPrintf(v+v_len, len, BAD_CAST("%s:%s"), qName->ln, w->processcontent_set.list_array[i].ln);
-                        PASSERT(1+l==len); // cause by terminating "0"
+                        assert(1+l==len); // cause by terminating "0"
                         v_len+=l;
                     }
                 }
             }
             if (NULL!=v) {
-                mceQNameLevel_t* mceQName=mceQNameLevelLookup(&w->registered_set, w->ns_mce, NULL, PTRUE);
-                PASSERT(NULL!=mceQName);
+                mceQNameLevel_t* mceQName=mceQNameLevelLookup(&w->registered_set, w->ns_mce, NULL, true);
+                assert(NULL!=mceQName);
                 if (NULL!=mceQName) {
                     xmlTextWriterWriteAttributeNS(w->writer, mceQName->ln, BAD_CAST("ProcessContent"), NULL, v);
                 }
@@ -170,7 +170,7 @@ int mceTextWriterStartElement(mceTextWriter *w, const xmlChar *ns, const xmlChar
         }
     } else {
         // namespace not registered => not good!
-        PASSERT(0==ret);
+        assert(0==ret);
     }
     w->level++;
     return ret;
@@ -181,7 +181,7 @@ int mceTextWriterEndElement(mceTextWriter *w, const xmlChar *ns, const xmlChar *
     ret=xmlTextWriterEndElement(w->writer);
     mceQNameLevelCleanup(&w->registered_set, w->level);
     mceQNameLevelCleanup(&w->processcontent_set, w->level);
-    PASSERT(w->level>0);
+    assert(w->level>0);
     w->level--;
     return ret;
 }
@@ -194,8 +194,8 @@ int mceTextWriterWriteString(mceTextWriter *w, const xmlChar *content) {
 
 const xmlChar *mceTextWriterRegisterNamespace(mceTextWriter *w, const xmlChar *ns, const xmlChar *prefix, int flags) {
     mceQNameLevelAdd(&w->registered_set, ns, prefix, w->level);
-    mceQNameLevel_t *ret=mceQNameLevelLookup(&w->registered_set, ns, prefix, PFALSE);
-    PASSERT(NULL!=ret); // not inserted? why?
+    mceQNameLevel_t *ret=mceQNameLevelLookup(&w->registered_set, ns, prefix, false);
+    assert(NULL!=ret); // not inserted? why?
     if (NULL!=ret) {
         ret->flag=flags;
         return ret->ns;
@@ -212,8 +212,8 @@ int mceTextWriterAttributeF(mceTextWriter *w, const xmlChar *ns, const xmlChar *
     va_list args;
     int ret=0;
     va_start(args, value); 
-    PASSERT(w->level>=w->registered_set.max_level);
-    mceQNameLevel_t* qName=mceQNameLevelLookup(&w->registered_set, ns, NULL, PTRUE);
+    assert(w->level>=w->registered_set.max_level);
+    mceQNameLevel_t* qName=mceQNameLevelLookup(&w->registered_set, ns, NULL, true);
     if (NULL!=qName) {
         if (NULL==qName->ln) {
             ret=xmlTextWriterWriteVFormatAttribute(w->writer, ln, value, args);
@@ -221,7 +221,7 @@ int mceTextWriterAttributeF(mceTextWriter *w, const xmlChar *ns, const xmlChar *
             ret=xmlTextWriterWriteVFormatAttributeNS(w->writer, qName->ln, ln, NULL, value, args);
         }
     } else {
-        PASSERT(0); // hmm namespace not registered?
+        assert(0); // hmm namespace not registered?
     }
     va_end(args);
     return ret;
@@ -238,11 +238,11 @@ int mceTextWriterEndAlternateContent(mceTextWriter *w) {
 int mceTextWriterStartChoice(mceTextWriter *w, const xmlChar *ns) {
     int ret=xmlTextWriterStartElementNS(w->writer, BAD_CAST("mce"), BAD_CAST("Choice"), NULL);
     if (-1!=ret) {
-        mceQNameLevel_t* qName=mceQNameLevelLookup(&w->registered_set, ns, NULL, PTRUE);
+        mceQNameLevel_t* qName=mceQNameLevelLookup(&w->registered_set, ns, NULL, true);
         if (NULL!=qName) {
             xmlTextWriterWriteAttribute(w->writer, BAD_CAST("Requires"), qName->ln);
         } else {
-            PASSERT(0); // namespace not registered
+            assert(0); // namespace not registered
             ret=-1;
         }
     }

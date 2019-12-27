@@ -49,18 +49,18 @@ int main( int argc, const char* argv[] )
     time_t start_time=time(NULL);
     FILE *file=NULL;
     int writer_indent=0;
-    pbool_t reader_mce=PTRUE;
+    pbool_t reader_mce=true;
     const char *fileName=NULL;
     for(int i=1;i<argc;i++) {
-        if ((0==xmlStrcmp(_X("--understands"), _X(argv[i])) || 0==xmlStrcmp(_X("-u"), _X(argv[i]))) && i+1<argc) {
+        if ((0==xmlStrcmp(BAD_CAST("--understands"), BAD_CAST(argv[i])) || 0==xmlStrcmp(BAD_CAST("-u"), BAD_CAST(argv[i]))) && i+1<argc) {
             i++; // skip namespace, registered later when parser was created.
-        } else if ((0==xmlStrcmp(_X("--out"), _X(argv[i])) || 0==xmlStrcmp(_X("--out"), _X(argv[i]))) && i+1<argc && NULL==file) {
+        } else if ((0==xmlStrcmp(BAD_CAST("--out"), BAD_CAST(argv[i])) || 0==xmlStrcmp(BAD_CAST("--out"), BAD_CAST(argv[i]))) && i+1<argc && NULL==file) {
             const char *filename=argv[++i];
             file=fopen(filename, "w");
-        } else if (0==xmlStrcmp(_X("--indent"), _X(argv[i]))) {
+        } else if (0==xmlStrcmp(BAD_CAST("--indent"), BAD_CAST(argv[i]))) {
             writer_indent=1;
-        } else if (0==xmlStrcmp(_X("--raw"), _X(argv[i]))) {
-            reader_mce=PFALSE;
+        } else if (0==xmlStrcmp(BAD_CAST("--raw"), BAD_CAST(argv[i]))) {
+            reader_mce=false;
         } else if (NULL==fileName) {
             fileName=argv[i];
         } else {
@@ -78,13 +78,13 @@ int main( int argc, const char* argv[] )
         mceTextReaderInit(&mceTextReader, ('-'==fileName[0] && 0==fileName[1]?xmlReaderForFd(0, NULL, NULL, 0):xmlReaderForFile(fileName, NULL, 0)));
         mceTextReaderDisableMCE(&mceTextReader, !reader_mce);
         for(int i=1;i<argc;i++) {
-            if ((0==xmlStrcmp(_X("--understands"), _X(argv[i])) || 0==xmlStrcmp(_X("-u"), _X(argv[i]))) && i+1<argc) {
-                const xmlChar *ns=_X(argv[++i]);
+            if ((0==xmlStrcmp(BAD_CAST("--understands"), BAD_CAST(argv[i])) || 0==xmlStrcmp(BAD_CAST("-u"), BAD_CAST(argv[i]))) && i+1<argc) {
+                const xmlChar *ns=BAD_CAST(argv[++i]);
                 mceTextReaderUnderstandsNamespace(&mceTextReader, ns);
             }
         }
 
-        if (-1==mceTextReaderDump(&mceTextReader, writer, PFALSE)) {
+        if (-1==mceTextReaderDump(&mceTextReader, writer, false)) {
             ret=mceTextReaderGetError(&mceTextReader);
         } else {
             ret=0;

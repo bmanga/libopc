@@ -33,7 +33,7 @@
 /** @file opc/xmlwriter.h
  
  */
-#include <opc/config.h>
+#include <config.h>
 #include <mce/textwriter.h>
 
 #ifndef OPC_XMLWRITER_H

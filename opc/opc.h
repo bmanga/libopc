@@ -33,7 +33,7 @@
 /** @file opc/opc.h
  The opc module contains the basic library functions.
 */
-#include <opc/config.h>
+#include <config.h>
 #include <opc/container.h>
 #include <opc/part.h>
 #include <opc/relation.h>

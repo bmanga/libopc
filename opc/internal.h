@@ -38,7 +38,7 @@
 #ifndef OPC_INTERNAL_H
 #define OPC_INTERNAL_H
 
-#include <opc/config.h>
+#include <config.h>
 #include <opc/container.h>
 #include <opc/zip.h>
 #include <zlib.h>
