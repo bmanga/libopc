@@ -103,7 +103,7 @@ extern "C" {
      /**
       Callback to seek a file. E.g. for a FILE * context this can be implemented as
       \code
-      static opc_ofs_t opcFileSeek(void *iocontext, opc_ofs_t ofs) {
+      static size_t opcFileSeek(void *iocontext, size_t ofs) {
           int ret=fseek((FILE*)iocontext, ofs, SEEK_SET);
           if (ret>=0) {
               return ftell((FILE*)iocontext);
@@ -113,12 +113,12 @@ extern "C" {
       }
       \endcode
       */
-    typedef opc_ofs_t opcFileSeekCallback(void *iocontext, opc_ofs_t ofs);
+    typedef size_t opcFileSeekCallback(void *iocontext, size_t ofs);
 
      /**
       Callback to trim a file. E.g. for a FILE * context this can be implemented as
       \code
-      static int opcFileTrim(void *iocontext, opc_ofs_t new_size) {
+      static int opcFileTrim(void *iocontext, size_t new_size) {
       #ifdef WIN32
           return _chsize(fileno((FILE*)iocontext), new_size);
       #else
@@ -127,7 +127,7 @@ extern "C" {
       }
       \endcode
       */
-    typedef int opcFileTrimCallback(void *iocontext, opc_ofs_t new_size);
+    typedef int opcFileTrimCallback(void *iocontext, size_t new_size);
 
      /**
       Callback to flush a file. E.g. for a FILE * context this can be implemented as
@@ -144,7 +144,7 @@ extern "C" {
       */
     typedef struct OPC_FILERAWSTATE_STRUCT {
         opc_error_t err;
-        opc_ofs_t   buf_pos; // current pos in file
+        size_t   buf_pos; // current pos in file
     } opcFileRawState;
 
     /**
@@ -160,7 +160,7 @@ extern "C" {
         void *iocontext;
         int flags;
         opcFileRawState state;
-        opc_ofs_t file_size;
+        size_t file_size;
     } opcIO_t;
 
     /**
@@ -174,7 +174,7 @@ extern "C" {
                               opcFileTrimCallback *iotrim,
                               opcFileFlushCallback *ioflush,
                               void *iocontext,
-                              pofs_t file_size,
+                              size_t file_size,
                               int flags);
 
     /**
@@ -186,7 +186,7 @@ extern "C" {
       Initialize an IO for memory.
       \warning Currently supports READ-ONLY file access.
       */
-    opc_error_t opcFileInitIOMemory(opcIO_t *io, const opc_uint8_t *data, opc_uint32_t data_len, int flags);
+    opc_error_t opcFileInitIOMemory(opcIO_t *io, const uint8_t *data, uint32_t data_len, int flags);
 
     /**
       Cleanup an IO context, i.e. release all system resources.

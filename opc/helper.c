@@ -30,8 +30,10 @@
  OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include <opc/helper.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-static puint32_t opcHelperEncodeFilename(const xmlChar *name, char *buf, int buf_len, opc_bool_t rels_segment) {
+static uint32_t opcHelperEncodeFilename(const xmlChar *name, char *buf, int buf_len, bool rels_segment) {
     int name_len=xmlStrlen(name);
     int len=name_len;
     int buf_ofs=0;
@@ -89,19 +91,19 @@ static puint32_t opcHelperEncodeFilename(const xmlChar *name, char *buf, int buf
     return buf_ofs;
 }
 
-static puint32_t opcHelperFilenameAppendPiece(opc_uint32_t segment_number, opc_bool_t last_segment, char *buf, int buf_ofs, int buf_len) {
+static uint32_t opcHelperFilenameAppendPiece(uint32_t segment_number, bool last_segment, char *buf, int buf_ofs, int buf_len) {
     if (buf_ofs>0) { // only append to non-empty filenames
         int len=0;
         if (0==segment_number && last_segment) {
             // only one segment, do not append anything...
         } else if (last_segment) {
-            OPC_ASSERT(segment_number>0); // we have a last segment
+            assert(segment_number>0); // we have a last segment
             if (NULL==buf || (buf_ofs<buf_len && (len=snprintf(buf+buf_ofs, buf_len-buf_ofs, "/[%i].last.piece", segment_number))>14)) {
                 buf_ofs+=len;
                 buf_len-=len;
             }
         } else {
-            OPC_ASSERT(!last_segment); // we have a segment with more to come...
+            assert(!last_segment); // we have a segment with more to come...
             if (NULL==buf || (buf_ofs<buf_len && (len=snprintf(buf+buf_ofs, buf_len-buf_ofs, "/[%i].piece", segment_number))>9)) {
                 buf_ofs+=len;
                 buf_len-=len;
@@ -114,23 +116,23 @@ static puint32_t opcHelperFilenameAppendPiece(opc_uint32_t segment_number, opc_b
 
 
 
-opc_uint16_t opcHelperAssembleSegmentName(char *out, opc_uint16_t out_size, const xmlChar *name, opc_uint32_t segment_number, opc_uint32_t next_segment_id, opc_bool_t rels_segment, opc_uint16_t *out_max) {
-    opc_uint16_t out_length=opcHelperEncodeFilename(name, out, out_size, rels_segment); 
-    opc_uint16_t const _out_max=out_length+24; // file+|/[4294967296].last.piece|=file+24
+uint16_t opcHelperAssembleSegmentName(char *out, uint16_t out_size, const xmlChar *name, uint32_t segment_number, uint32_t next_segment_id, bool rels_segment, uint16_t *out_max) {
+    uint16_t out_length=opcHelperEncodeFilename(name, out, out_size, rels_segment); 
+    uint16_t const _out_max=out_length+24; // file+|/[4294967296].last.piece|=file+24
                                                // _rels/file.rels=|_rels/|+|.rels|=6+5=11
     out_length=opcHelperFilenameAppendPiece(segment_number, next_segment_id, out, out_length, out_size);
-    OPC_ASSERT(out_length<=out_size);
-    OPC_ASSERT(out_length<=_out_max);
+    assert(out_length<=out_size);
+    assert(out_length<=_out_max);
     if (NULL!=out_max) *out_max=_out_max;
     return out_length;
 }
 
 
-opc_error_t opcHelperSplitFilename(opc_uint8_t *filename, opc_uint32_t filename_length, opc_uint32_t *segment_number, opc_bool_t *last_segment, opc_bool_t *rel_segment) {
+opc_error_t opcHelperSplitFilename(uint8_t *filename, uint32_t filename_length, uint32_t *segment_number, bool *last_segment, bool *rel_segment) {
     opc_error_t ret=OPC_ERROR_STREAM;
     if (NULL!=segment_number) *segment_number=0;
-    if (NULL!=last_segment) *last_segment=OPC_TRUE;
-    if (NULL!=rel_segment) *rel_segment=OPC_FALSE;
+    if (NULL!=last_segment) *last_segment=true;
+    if (NULL!=rel_segment) *rel_segment=false;
     if (filename_length>7 // "].piece"  suffix
         && filename[filename_length-7]==']'
         && filename[filename_length-6]=='.'
@@ -139,14 +141,14 @@ opc_error_t opcHelperSplitFilename(opc_uint8_t *filename, opc_uint32_t filename_
         && filename[filename_length-3]=='e'
         && filename[filename_length-2]=='c'
         && filename[filename_length-1]=='e') {
-        opc_uint32_t i=filename_length-7;
+        uint32_t i=filename_length-7;
         filename[i--]='\0';
         while(i>0 && filename[i]>='0' && filename[i]<='9') {
             i--;
         }
         if (i>2 && filename[i-2]=='/' && filename[i-1]=='[' && '\0'!=filename[i]) {
             if (NULL!=segment_number) *segment_number=atoi((char*)(filename+i));
-            if (NULL!=last_segment) *last_segment=OPC_FALSE;
+            if (NULL!=last_segment) *last_segment=false;
             filename[i-2]='\0';
             ret=OPC_ERROR_NONE;
         }
@@ -163,14 +165,14 @@ opc_error_t opcHelperSplitFilename(opc_uint8_t *filename, opc_uint32_t filename_
         && filename[filename_length-3]=='e'
         && filename[filename_length-2]=='c'
         && filename[filename_length-1]=='e') {
-        opc_uint32_t i=filename_length-12;
+        uint32_t i=filename_length-12;
         filename[i--]='\0';
         while(i>0 && filename[i]>='0' && filename[i]<='9') {
             i--;
         }
         if (i>2 && filename[i-2]=='/' &&  filename[i-1]=='[' && '\0'!=filename[i]) {
             if (NULL!=segment_number) *segment_number=atoi((char*)(filename+i));
-            if (NULL!=last_segment) *last_segment=OPC_TRUE;
+            if (NULL!=last_segment) *last_segment=true;
             filename[i-2]='\0';
             ret=OPC_ERROR_NONE;
         }
@@ -180,7 +182,7 @@ opc_error_t opcHelperSplitFilename(opc_uint8_t *filename, opc_uint32_t filename_
         && filename[filename_length-3]=='e'
         && filename[filename_length-2]=='l'
         && filename[filename_length-1]=='s') {
-        opc_uint32_t i=filename_length-5;
+        uint32_t i=filename_length-5;
         while(i>0 && filename[i-1]!='/') i--;
         //"_rels/"
         if (i>=6
@@ -190,12 +192,12 @@ opc_error_t opcHelperSplitFilename(opc_uint8_t *filename, opc_uint32_t filename_
             && filename[i-3]=='l' 
             && filename[i-2]=='s' 
             && filename[i-1]=='/') {
-            opc_uint32_t j=i;
+            uint32_t j=i;
             for(;j<filename_length-5;j++) {
                 filename[j-6]=filename[j];
             }
             filename[j-6]=0;
-            if (NULL!=rel_segment) *rel_segment=OPC_TRUE;
+            if (NULL!=rel_segment) *rel_segment=true;
         }
         ret=OPC_ERROR_NONE;
     } else {

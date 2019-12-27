@@ -55,7 +55,7 @@ extern "C" {
      Reads maximal \c buffer_len bytes from the input \c stream to \c buffer. 
      \return The number of byes read or "0" in case of an error or end-of-stream.
      */
-    opc_uint32_t opcContainerReadInputStream(opcContainerInputStream* stream, opc_uint8_t *buffer, opc_uint32_t buffer_len);
+    uint32_t opcContainerReadInputStream(opcContainerInputStream* stream, uint8_t *buffer, uint32_t buffer_len);
 
     /**
       Closes the input stream and releases all system resources.

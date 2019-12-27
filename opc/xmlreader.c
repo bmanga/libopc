@@ -32,7 +32,7 @@
 #include <opc/opc.h>
 #include "internal.h"
 
-opc_error_t opcXmlReaderOpenEx(opcContainer *container, mceTextReader_t *mceTextReader, const xmlChar *partName, opc_bool_t rels_segment, const char * URL, const char * encoding, int options) {
+opc_error_t opcXmlReaderOpenEx(opcContainer *container, mceTextReader_t *mceTextReader, const xmlChar *partName, bool rels_segment, const char * URL, const char * encoding, int options) {
     opcContainerInputStream* stream=opcContainerOpenInputStreamEx(container, partName, rels_segment);
     if (NULL!=stream) {
         if (0==mceTextReaderInit(mceTextReader, 
@@ -49,11 +49,11 @@ opc_error_t opcXmlReaderOpenEx(opcContainer *container, mceTextReader_t *mceText
 }
 
 opc_error_t opcXmlReaderOpen(opcContainer *container, mceTextReader_t *mceTextReader, const xmlChar *partName, const char * URL, const char * encoding, int options) {
-    return opcXmlReaderOpenEx(container, mceTextReader, (partName!=NULL && partName[0]=='/'?partName+1:partName), OPC_FALSE, URL, encoding, options);
+    return opcXmlReaderOpenEx(container, mceTextReader, (partName!=NULL && partName[0]=='/'?partName+1:partName), false, URL, encoding, options);
 }
 
 xmlDocPtr opcXmlReaderReadDoc(opcContainer *container, const xmlChar *partName, const char * URL, const char * encoding, int options) {
-    opcContainerInputStream* stream=opcContainerOpenInputStreamEx(container, partName, OPC_FALSE);
+    opcContainerInputStream* stream=opcContainerOpenInputStreamEx(container, partName, false);
     if (NULL!=stream) {
         xmlDocPtr doc=xmlReadIO((xmlInputReadCallback)opcContainerReadInputStream, 
                                 (xmlInputCloseCallback)opcContainerCloseInputStream, 

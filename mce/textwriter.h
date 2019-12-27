@@ -33,7 +33,6 @@
 /** @file mce/textwriter.h
 
 */
-#include <mce/config.h>
 #include <libxml/xmlwriter.h>
 #include <mce/helper.h>
 

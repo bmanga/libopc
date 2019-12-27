@@ -1,11 +1,11 @@
 #include <mce/helper.h>
 #include <libxml/xmlmemory.h>
 
-static pbool_t mceQNameLevelLookupEx(mceQNameLevelSet_t *qname_level_set, const xmlChar *ns, const xmlChar *ln, puint32_t *pos, pbool_t ignore_ln) {
-    puint32_t i=0;
-    puint32_t j=qname_level_set->list_items;
+static bool mceQNameLevelLookupEx(mceQNameLevelSet_t *qname_level_set, const xmlChar *ns, const xmlChar *ln, uint32_t *pos, bool ignore_ln) {
+    uint32_t i=0;
+    uint32_t j=qname_level_set->list_items;
     while(i<j) {
-        puint32_t m=i+(j-i)/2;
+        uint32_t m=i+(j-i)/2;
         PASSERT(i<=m && m<j);
         mceQNameLevel_t *q2=&qname_level_set->list_array[m];
         int const ns_cmp=(NULL==ns?(NULL==q2->ns?0:-1):(NULL==q2->ns?+1:xmlStrcmp(ns, q2->ns)));
@@ -17,19 +17,19 @@ static pbool_t mceQNameLevelLookupEx(mceQNameLevelSet_t *qname_level_set, const 
     return PFALSE;
 }
 
-mceQNameLevel_t* mceQNameLevelLookup(mceQNameLevelSet_t *qname_level_set, const xmlChar *ns, const xmlChar *ln, pbool_t ignore_ln) {
-    puint32_t pos=0;
+mceQNameLevel_t* mceQNameLevelLookup(mceQNameLevelSet_t *qname_level_set, const xmlChar *ns, const xmlChar *ln, bool ignore_ln) {
+    uint32_t pos=0;
     return (mceQNameLevelLookupEx(qname_level_set, ns, ln, &pos, ignore_ln)?qname_level_set->list_array+pos:NULL);
 }
 
-pbool_t mceQNameLevelAdd(mceQNameLevelSet_t *qname_level_set, const xmlChar *ns, const xmlChar *ln, puint32_t level) {
-    puint32_t i=0;
-    pbool_t ret=PFALSE;
+bool mceQNameLevelAdd(mceQNameLevelSet_t *qname_level_set, const xmlChar *ns, const xmlChar *ln, uint32_t level) {
+    uint32_t i=0;
+    bool ret=PFALSE;
     if (!mceQNameLevelLookupEx(qname_level_set, ns, ln, &i, PFALSE)) {
         mceQNameLevel_t *new_list_array=NULL;
         if (NULL!=(new_list_array=(mceQNameLevel_t *)xmlRealloc(qname_level_set->list_array, (1+qname_level_set->list_items)*sizeof(*qname_level_set->list_array)))) {
             qname_level_set->list_array=new_list_array;
-            for (puint32_t k=qname_level_set->list_items;k>i;k--) {
+            for (uint32_t k=qname_level_set->list_items;k>i;k--) {
                 qname_level_set->list_array[k]=qname_level_set->list_array[k-1];
             }
             qname_level_set->list_items++;
@@ -47,11 +47,11 @@ pbool_t mceQNameLevelAdd(mceQNameLevelSet_t *qname_level_set, const xmlChar *ns,
     return ret;
 }
 
-pbool_t mceQNameLevelCleanup(mceQNameLevelSet_t *qname_level_set, puint32_t level) {
+bool mceQNameLevelCleanup(mceQNameLevelSet_t *qname_level_set, uint32_t level) {
     if (qname_level_set->max_level>=level) {
         qname_level_set->max_level=0;
-        puint32_t i=0;
-        for(puint32_t j=0;j<qname_level_set->list_items;j++) {
+        uint32_t i=0;
+        for(uint32_t j=0;j<qname_level_set->list_items;j++) {
             if (qname_level_set->list_array[j].level>=level) {
                 PASSERT(qname_level_set->list_array[j].level==level); // cleanup should be called for every level...
                 if (NULL!=qname_level_set->list_array[j].ln) xmlFree(qname_level_set->list_array[j].ln);
@@ -70,8 +70,8 @@ pbool_t mceQNameLevelCleanup(mceQNameLevelSet_t *qname_level_set, puint32_t leve
 }
 
 
-pbool_t mceSkipStackPush(mceSkipStack_t *skip_stack, puint32_t level_start, puint32_t level_end, mceSkipState_t state) {
-    pbool_t ret=PFALSE;
+bool mceSkipStackPush(mceSkipStack_t *skip_stack, uint32_t level_start, uint32_t level_end, mceSkipState_t state) {
+    bool ret=PFALSE;
     mceSkipItem_t *new_stack_array=NULL;
     if (NULL!=(new_stack_array=(mceSkipItem_t *)xmlRealloc(skip_stack->stack_array, (1+skip_stack->stack_items)*sizeof(*skip_stack->stack_array)))) {
         skip_stack->stack_array=new_stack_array;
@@ -94,19 +94,19 @@ mceSkipItem_t *mceSkipStackTop(mceSkipStack_t *skip_stack) {
     return NULL!=skip_stack->stack_array && skip_stack->stack_items>0 ? &skip_stack->stack_array[skip_stack->stack_items-1] : NULL;
 }
 
-pbool_t mceSkipStackSkip(mceSkipStack_t *skip_stack, puint32_t level) {
+bool mceSkipStackSkip(mceSkipStack_t *skip_stack, uint32_t level) {
     return NULL!=skip_stack->stack_array && skip_stack->stack_items>0 
         && level>=skip_stack->stack_array[skip_stack->stack_items-1].level_start 
         && level<skip_stack->stack_array[skip_stack->stack_items-1].level_end;
 }
 
-pbool_t mceCtxInit(mceCtx_t *ctx) {
+bool mceCtxInit(mceCtx_t *ctx) {
     memset(ctx, 0, sizeof(*ctx));
-    mceCtxSuspendProcessing(ctx, _X("http://schemas.openxmlformats.org/presentationml/2006/main"), _X("extLst"));
+    mceCtxSuspendProcessing(ctx, BAD_CAST("http://schemas.openxmlformats.org/presentationml/2006/main"), BAD_CAST("extLst"));
     return PTRUE;
 }
 
-pbool_t mceCtxCleanup(mceCtx_t *ctx) {
+bool mceCtxCleanup(mceCtx_t *ctx) {
 
     PASSERT(ctx->error!=MCE_ERROR_NONE || 0==ctx->ignorable_set.list_items);
     PENSURE(mceQNameLevelCleanup(&ctx->ignorable_set, 0));
@@ -136,17 +136,17 @@ pbool_t mceCtxCleanup(mceCtx_t *ctx) {
     return PTRUE;
 }
 
-pbool_t mceCtxUnderstandsNamespace(mceCtx_t *ctx, const xmlChar *ns) {
+bool mceCtxUnderstandsNamespace(mceCtx_t *ctx, const xmlChar *ns) {
     return mceQNameLevelAdd(&ctx->understands_set, ns, NULL, 0);
 }
 
-pbool_t mceCtxSuspendProcessing(mceCtx_t *ctx, const xmlChar *ns, const xmlChar *ln) {
+bool mceCtxSuspendProcessing(mceCtx_t *ctx, const xmlChar *ns, const xmlChar *ln) {
     return mceQNameLevelAdd(&ctx->suspended_set, ns, ln, 0);
 }
 
 
 #if (MCE_NAMESPACE_SUBSUMPTION_ENABLED)
-pbool_t mceCtxSubsumeNamespace(mceCtx_t *ctx, const xmlChar *prefix_new, const xmlChar *ns_new, const xmlChar *ns_old) {
+bool mceCtxSubsumeNamespace(mceCtx_t *ctx, const xmlChar *prefix_new, const xmlChar *ns_new, const xmlChar *ns_old) {
     return mceQNameLevelAdd(&ctx->subsume_namespace_set, ns_old, ns_new, 0)
         && mceQNameLevelAdd(&ctx->subsume_prefix_set, ns_new, prefix_new, 0);
 }

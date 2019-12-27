@@ -35,7 +35,7 @@
 
 static int opcTextWriterWrite(void * context, const char * buffer, int len) {
     opcContainerOutputStream *stream=(opcContainerOutputStream *)context;
-    return opcContainerWriteOutputStream(stream, (const opc_uint8_t*)buffer, len);
+    return opcContainerWriteOutputStream(stream, (const uint8_t*)buffer, len);
 }
 
 static int opcTextWriterClose(void * context) {

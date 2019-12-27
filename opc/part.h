@@ -83,7 +83,7 @@ extern "C" {
       If \c override_only then the return value will be NULL for parts not having an override type.
       The string is interned and must not be freed.
       */
-    const xmlChar *opcPartGetTypeEx(opcContainer *c, opcPart part, opc_bool_t override_only);
+    const xmlChar *opcPartGetTypeEx(opcContainer *c, opcPart part, bool override_only);
 
     /**
      Deleted that part \c absolutePath in the \c container.
@@ -109,7 +109,7 @@ extern "C" {
     /**
       Returns the size in bytes of the \c part.
       */
-    opc_ofs_t opcPartGetSize(opcContainer *c, opcPart part);
+    size_t opcPartGetSize(opcContainer *c, opcPart part);
 
 #ifdef __cplusplus
 } /* extern "C" */

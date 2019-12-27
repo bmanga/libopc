@@ -50,7 +50,6 @@ extern "C" {
 #endif
 
 
-#include <mce/config.h>
 #include <opc/opc.h>
 #include <mce/helper.h>
 #include <libxml/xmlwriter.h>
@@ -101,14 +100,14 @@ extern "C" {
       \code
       mceTextReader reader;
       mceTextReaderInit(&reader, xmlNewTextReaderFilename("sample.xml"));
-      mceTextReaderUnderstandsNamespace(&reader, _X("http://myextension"));
+      mceTextReaderUnderstandsNamespace(&reader, BAD_CAST("http://myextension"));
       xmlTextWriterPtr writer=xmlNewTextWriterFilename("out.xml", 0);
       mceTextReaderDump(&reader, writer, P_FALSE);
       xmlFreeTextWriter(writer);
       mceTextReaderCleanup(&reader);
       \endcode
       */
-    int mceTextReaderDump(mceTextReader_t *mceTextReader, xmlTextWriter *writer, pbool_t fragment);
+    int mceTextReaderDump(mceTextReader_t *mceTextReader, xmlTextWriter *writer, bool fragment);
 
     /**
       Registers an MCE namespace.
@@ -120,7 +119,7 @@ extern "C" {
      Disable MCE processing.
      \return Returns old value.
      */
-    pbool_t mceTextReaderDisableMCE(mceTextReader_t *mceTextReader, pbool_t flag);
+    bool mceTextReaderDisableMCE(mceTextReader_t *mceTextReader, bool flag);
 
 
     /**
@@ -228,7 +227,7 @@ if (!xmlTextReaderIsEmptyElement((_reader_)->reader)) { \
   \code
   void handleElement(reader) {
     mce_start_choice(reader) {
-        mce_start_element(reader, _X("ns"), _X("element")) {
+        mce_start_element(reader, BAD_CAST("ns"), BAD_CAST("element")) {
             
         } mce_end_element(reader)
     } mce_end_choice(reader);
@@ -236,10 +235,10 @@ if (!xmlTextReaderIsEmptyElement((_reader_)->reader)) { \
 
   void parse(reader) {
     mce_start_document(reader) {
-      mce_start_element(reader, _X("ns"), _X("ln")) {
+      mce_start_element(reader, BAD_CAST("ns"), BAD_CAST("ln")) {
         mce_skip_attributes(reader);
         mce_start_children(reader) {
-           mce_match_element(reader, _X("ns"), _X("element")) {
+           mce_match_element(reader, BAD_CAST("ns"), BAD_CAST("element")) {
              handleElement(reader);
            }
         } mce_end_children(reader);
@@ -260,18 +259,18 @@ if (!xmlTextReaderIsEmptyElement((_reader_)->reader)) { \
  \code
   mce_start_element(reader) {
     mce_start_attributes(reader) {
-      mce_start_attribute(reader, _X("ns"), _X("lnA")) {
+      mce_start_attribute(reader, BAD_CAST("ns"), BAD_CAST("lnA")) {
          // code for handling lnA.
       } mce_end_attribute(reader);
-      mce_start_attribute(reader, _X("ns"), _X("lnB")) {
+      mce_start_attribute(reader, BAD_CAST("ns"), BAD_CAST("lnB")) {
          // code for handling lnB.
       } mce_end_attribute(reader);
     } mce_end_attributes(reader);
     mce_start_children(reader) {
-        mce_start_element(reader, _X("ns"), _X("lnA")) {
+        mce_start_element(reader, BAD_CAST("ns"), BAD_CAST("lnA")) {
          // code for handling lnA.
         } mce_end_element(reader);
-        mce_start_element(reader, _X("ns"), _X("lnB")) {
+        mce_start_element(reader, BAD_CAST("ns"), BAD_CAST("lnB")) {
          // code for handling lnB.
         } mce_end_element(reader);
         mce_start_text(reader) {
@@ -339,7 +338,7 @@ if (!xmlTextReaderIsEmptyElement((_reader_)->reader)) { \
   \code
   void handleA(reader) {
     mce_start_choice(reader) {
-        mce_start_attribute(reader, _X("ns"), _X("attr")) {
+        mce_start_attribute(reader, BAD_CAST("ns"), BAD_CAST("attr")) {
 
         } mce_end_attribute(reader);
     } mce_end_choice(reader);
@@ -347,9 +346,9 @@ if (!xmlTextReaderIsEmptyElement((_reader_)->reader)) { \
 
   void parse(reader) {
     mce_start_document(reader) {
-      mce_start_element(reader, _X("ns"), _X("ln")) {
+      mce_start_element(reader, BAD_CAST("ns"), BAD_CAST("ln")) {
         mce_start_attributes(reader) {
-           mce_match_attribute(reader, _X("ns"), _X("attr")) {
+           mce_match_attribute(reader, BAD_CAST("ns"), BAD_CAST("attr")) {
              handleA(reader);
            }
         } mce_end_attributes(reader);
@@ -381,23 +380,23 @@ if (!xmlTextReaderIsEmptyElement((_reader_)->reader)) { \
 /**
   Error handling for MCE parsers.
   \code
-   mce_start_element(&reader, NULL, _X("Default")) {
+   mce_start_element(&reader, NULL, BAD_CAST("Default")) {
        const xmlChar *ext=NULL;
        const xmlChar *type=NULL;
        mce_start_attributes(&reader) {
-           mce_start_attribute(&reader, NULL, _X("Extension")) {
+           mce_start_attribute(&reader, NULL, BAD_CAST("Extension")) {
                ext=xmlTextReaderConstValue(reader.reader);
            } mce_end_attribute(&reader);
-           mce_start_attribute(&reader, NULL, _X("ContentType")) {
+           mce_start_attribute(&reader, NULL, BAD_CAST("ContentType")) {
                type=xmlTextReaderConstValue(reader.reader);
            } mce_end_attribute(&reader);
        } mce_end_attributes(&reader);
        mce_error_guard_start(&reader) {
            mce_error(&reader, NULL==ext || ext[0]==0, MCE_ERROR_VALIDATION, "Missing @Extension attribute!");
            mce_error(&reader, NULL==type || type[0]==0, MCE_ERROR_VALIDATION, "Missing @ContentType attribute!");
-           opcContainerType *ct=insertType(c, type, OPC_TRUE);
+           opcContainerType *ct=insertType(c, type, true);
            mce_error(&reader, NULL==ct, MCE_ERROR_MEMORY, NULL);
-           opcContainerExtension *ce=opcContainerInsertExtension(c, ext, OPC_TRUE);
+           opcContainerExtension *ce=opcContainerInsertExtension(c, ext, true);
            mce_error(&reader, NULL==ce, MCE_ERROR_MEMORY, NULL);
            mce_errorf(&reader, NULL!=ce->type && 0!=xmlStrcmp(ce->type, type), MCE_ERROR_VALIDATION, "Extension \"%s\" is mapped to type \"%s\" as well as \"%s\"", ext, type, ce->type);
            ce->type=ct->type;
@@ -426,9 +425,9 @@ if (!xmlTextReaderIsEmptyElement((_reader_)->reader)) { \
   \hideinitializer
 */
 #if defined(__GNUC__)
-#define mce_errorf(_reader_, guard, err, msg, ...) if (guard) { mceRaiseError((_reader_)->reader, &(_reader_)->mceCtx, err, _X((NULL!=msg?msg:#err)), ##__VA_ARGS__ );  continue; }
+#define mce_errorf(_reader_, guard, err, msg, ...) if (guard) { mceRaiseError((_reader_)->reader, &(_reader_)->mceCtx, err, BAD_CAST((NULL!=msg?msg:#err)), ##__VA_ARGS__ );  continue; }
 #else
-#define mce_errorf(_reader_, guard, err, msg, ...) if (guard) { mceRaiseError((_reader_)->reader, &(_reader_)->mceCtx, err, _X((NULL!=msg?msg:#err)), __VA_ARGS__ );  continue; }
+#define mce_errorf(_reader_, guard, err, msg, ...) if (guard) { mceRaiseError((_reader_)->reader, &(_reader_)->mceCtx, err, BAD_CAST((NULL!=msg?msg:#err)), __VA_ARGS__ );  continue; }
 #endif
 
 /**

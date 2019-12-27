@@ -45,7 +45,7 @@ extern "C" {
     /**
      Indentifier for an OPC relation.
      */
-    typedef opc_uint32_t opcRelation;
+    typedef uint32_t opcRelation;
 
 /**
   Constant which represents an invalid relation.
@@ -78,7 +78,7 @@ extern "C" {
                const xmlChar *external_target=opcRelationGetExternalTarget(c, part, rel);
                const xmlChar *target=(NULL!=internal_target?internal_target:external_target);
                const xmlChar *prefix=NULL;
-               opc_uint32_t counter=-1;
+               uint32_t counter=-1;
                const xmlChar *type=NULL;
                opcRelationGetInformation(c, part, rel, &prefix, &counter, &type);        
                if (-1==counter) { // no counter after prefix
@@ -121,17 +121,17 @@ extern "C" {
       Get information about a relation.
       \see opcRelationFirst
       */
-    void opcRelationGetInformation(opcContainer *container, opcPart part, opcRelation relation, const xmlChar **prefix, opc_uint32_t *counter, const xmlChar **type);
+    void opcRelationGetInformation(opcContainer *container, opcPart part, opcRelation relation, const xmlChar **prefix, uint32_t *counter, const xmlChar **type);
 
     /** 
       Add a relation to \c container from \c src part to \c dest part with id \c rid and type \c type.
       */
-    opc_uint32_t opcRelationAdd(opcContainer *container, opcPart src, const xmlChar *rid, opcPart dest, const xmlChar *type);
+    uint32_t opcRelationAdd(opcContainer *container, opcPart src, const xmlChar *rid, opcPart dest, const xmlChar *type);
 
     /** 
       Add an external relation to \c container from \c src part to \c target URL with id \c rid and type \c type.
       */
-    opc_uint32_t opcRelationAddExternal(opcContainer *container, opcPart src, const xmlChar *rid, const xmlChar *target, const xmlChar *type);
+    uint32_t opcRelationAddExternal(opcContainer *container, opcPart src, const xmlChar *rid, const xmlChar *target, const xmlChar *type);
 
 #ifdef __cplusplus
 } /* extern "C" */

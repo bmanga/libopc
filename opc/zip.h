@@ -72,20 +72,20 @@ extern "C" {
      */
     typedef struct OPC_ZIP_SEGMENT_INFO_STRUCT {
         xmlChar name[OPC_MAX_PATH]; 
-        opc_uint32_t name_len;
-        opc_uint32_t segment_number;
-        opc_bool_t   last_segment;
-        opc_bool_t   rels_segment;
-        opc_uint32_t header_size;
-        opc_uint32_t min_header_size;
-        opc_uint32_t trailing_bytes;
-        opc_uint32_t compressed_size;
-        opc_uint32_t uncompressed_size;
-        opc_uint16_t bit_flag;
-        opc_uint32_t data_crc;
-        opc_uint16_t compression_method;
-        opc_ofs_t    stream_ofs;
-        opc_uint16_t growth_hint;
+        uint32_t name_len;
+        uint32_t segment_number;
+        bool   last_segment;
+        bool   rels_segment;
+        uint32_t header_size;
+        uint32_t min_header_size;
+        uint32_t trailing_bytes;
+        uint32_t compressed_size;
+        uint32_t uncompressed_size;
+        uint16_t bit_flag;
+        uint32_t data_crc;
+        uint16_t compression_method;
+        size_t    stream_ofs;
+        uint16_t growth_hint;
     } opcZipSegmentInfo_t;
 
     /**
@@ -121,7 +121,7 @@ extern "C" {
     /**
       \see opcZipClose
      */
-    typedef opc_error_t (opcZipSegmentReleaseCallback)(opcZip *zip, opc_uint32_t segment_id);
+    typedef opc_error_t (opcZipSegmentReleaseCallback)(opcZip *zip, uint32_t segment_id);
 
     /** 
      Closes the ZIP archive \c zip and will call \c releaseCallback for every segment to give the implementer a chance
@@ -138,7 +138,7 @@ extern "C" {
       Commits all buffers and writes the ZIP archives local header directories.
       if \c trim is true then padding bytes will be removed, i.e. the ZIP file size fill be minimalized.
      */
-    opc_error_t opcZipCommit(opcZip *zip, opc_bool_t trim);
+    opc_error_t opcZipCommit(opcZip *zip, bool trim);
 
     /**
       Garbage collection on the passed \c zip archive. This will e.g. make deleted files available as free space.
@@ -151,26 +151,26 @@ extern "C" {
       Otherwise load the segment information for the ".rels." segment of \c partName.
       \return Returns the segment_id.
       */
-    opc_uint32_t opcZipLoadSegment(opcZip *zip, const xmlChar *partName, opc_bool_t rels_segment, opcZipSegmentInfo_t *info);
+    uint32_t opcZipLoadSegment(opcZip *zip, const xmlChar *partName, bool rels_segment, opcZipSegmentInfo_t *info);
 
     /**
       Create a segment with the given parameters.
       \return Returns the segment_id.
       */
-    opc_uint32_t opcZipCreateSegment(opcZip *zip, 
+    uint32_t opcZipCreateSegment(opcZip *zip, 
                                      const xmlChar *partName, 
-                                     opc_bool_t relsSegment, 
-                                     opc_uint32_t segment_size, 
-                                     opc_uint32_t growth_hint,
-                                     opc_uint16_t compression_method,
-                                     opc_uint16_t bit_flag);
+                                     bool relsSegment, 
+                                     uint32_t segment_size, 
+                                     uint32_t growth_hint,
+                                     uint16_t compression_method,
+                                     uint16_t bit_flag);
 
     /**
       Creates an input stream for the segment with \c segment_id.
       \see opcZipLoadSegment
       \see opcZipCreateSegment
       */
-    opcZipInputStream *opcZipOpenInputStream(opcZip *zip, opc_uint32_t segment_id);
+    opcZipInputStream *opcZipOpenInputStream(opcZip *zip, uint32_t segment_id);
 
     /**
      Free all resources of the input stream.
@@ -181,7 +181,7 @@ extern "C" {
      Read maximal \c buf_len bytes from the input stream into \buf. 
      \return Returns the number of bytes read.
      */
-    opc_uint32_t opcZipReadInputStream(opcZip *zip, opcZipInputStream *stream, opc_uint8_t *buf, opc_uint32_t buf_len);
+    uint32_t opcZipReadInputStream(opcZip *zip, opcZipInputStream *stream, uint8_t *buf, uint32_t buf_len);
 
 
     /**
@@ -190,38 +190,38 @@ extern "C" {
       Otherwise the segment with \c *segment_id will be overwritten.
      */
     opcZipOutputStream *opcZipCreateOutputStream(opcZip *zip, 
-                                             opc_uint32_t *segment_id, 
+                                             uint32_t *segment_id, 
                                              const xmlChar *partName, 
-                                             opc_bool_t relsSegment, 
-                                             opc_uint32_t segment_size, 
-                                             opc_uint32_t growth_hint,
-                                             opc_uint16_t compression_method,
-                                             opc_uint16_t bit_flag);
+                                             bool relsSegment, 
+                                             uint32_t segment_size, 
+                                             uint32_t growth_hint,
+                                             uint16_t compression_method,
+                                             uint16_t bit_flag);
 
     /**
       Opens an existing ouput stream for reading.
       The \c *segment_id will be set to -1 and reset on opcZipCloseOutputStream.
       \see opcZipCloseOutputStream
      */
-    opcZipOutputStream *opcZipOpenOutputStream(opcZip *zip, opc_uint32_t *segment_id);
+    opcZipOutputStream *opcZipOpenOutputStream(opcZip *zip, uint32_t *segment_id);
 
     /** 
       Will close the stream and free all resources. Additionally the new segment id will be stored in \c *segment_id.
       \see opcZipOpenOutputStream
       */
-    opc_error_t opcZipCloseOutputStream(opcZip *zip, opcZipOutputStream *stream, opc_uint32_t *segment_id);
+    opc_error_t opcZipCloseOutputStream(opcZip *zip, opcZipOutputStream *stream, uint32_t *segment_id);
 
     /**
      Write \c buf_len bytes to \c buf. 
      \return Returns the number of bytes written.
      */
-    opc_uint32_t opcZipWriteOutputStream(opcZip *zip, opcZipOutputStream *stream, const opc_uint8_t *buf, opc_uint32_t buf_len);
+    uint32_t opcZipWriteOutputStream(opcZip *zip, opcZipOutputStream *stream, const uint8_t *buf, uint32_t buf_len);
 
     /**
      Returns the first segment id or -1.
      Use the following code to iterarte through all segments.
      \code 
-     for(opc_uint32_t segment_id=opcZipGetFirstSegmentId(zip);
+     for(uint32_t segment_id=opcZipGetFirstSegmentId(zip);
          -1!=segment_id;
          segment_id=opcZipGetNextSegmentId(zip, segment_id) {
         ...
@@ -229,24 +229,24 @@ extern "C" {
      \endcode
      \see opcZipGetNextSegmentId
      */
-    opc_uint32_t opcZipGetFirstSegmentId(opcZip *zip);
+    uint32_t opcZipGetFirstSegmentId(opcZip *zip);
 
     /**
      Returns the next segment id or -1.
      \see opcZipGetFirstSegmentId
      */
-    opc_uint32_t opcZipGetNextSegmentId(opcZip *zip, opc_uint32_t segment_id);
+    uint32_t opcZipGetNextSegmentId(opcZip *zip, uint32_t segment_id);
 
     /**
      Returns info about the given segment id.
      */
-    opc_error_t opcZipGetSegmentInfo(opcZip *zip, opc_uint32_t segment_id, const xmlChar **name, opc_bool_t *rels_segment, opc_uint32_t *crc);
+    opc_error_t opcZipGetSegmentInfo(opcZip *zip, uint32_t segment_id, const xmlChar **name, bool *rels_segment, uint32_t *crc);
 
     /**
      Marks a given segments as deleted.
      \see opcZipGC
      */
-    opc_bool_t opcZipSegmentDelete(opcZip *zip, opc_uint32_t *first_segment, opc_uint32_t *last_segment, opcZipSegmentReleaseCallback* releaseCallback);
+    bool opcZipSegmentDelete(opcZip *zip, uint32_t *first_segment, uint32_t *last_segment, opcZipSegmentReleaseCallback* releaseCallback);
 
 #ifdef __cplusplus
 } /* extern "C" */

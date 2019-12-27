@@ -33,8 +33,8 @@
 #include "internal.h"
 
 
-opcContainerRelation *opcContainerFindRelationByType(opcContainer *container, opcContainerRelation *relation_array, opc_uint32_t relation_items, const xmlChar *mimeType) {
-    for(opc_uint32_t i=0;i<relation_items;i++) {
+opcContainerRelation *opcContainerFindRelationByType(opcContainer *container, opcContainerRelation *relation_array, uint32_t relation_items, const xmlChar *mimeType) {
+    for(uint32_t i=0;i<relation_items;i++) {
         if (0==xmlStrcmp(relation_array[i].relation_type, mimeType)) {
             return &relation_array[i];
         }
@@ -47,7 +47,7 @@ static opcContainerRelation* _opcRelationFind(opcContainer *container, opcPart p
     if (OPC_PART_INVALID==part) {
         return opcContainerFindRelation(container, container->relation_array, container->relation_items, relation);
     } else {
-        opcContainerPart *cp=opcContainerInsertPart(container, part, OPC_FALSE);
+        opcContainerPart *cp=opcContainerInsertPart(container, part, false);
         return (cp!=NULL?opcContainerFindRelation(container, cp->relation_array, cp->relation_items, relation):NULL);
     }
 }
@@ -61,7 +61,7 @@ opcRelation opcRelationFind(opcContainer *container, opcPart part, const xmlChar
             rel=opcContainerFindRelationByType(container, container->relation_array, container->relation_items, mimeType);
         }
     } else {
-        opcContainerPart *cp=opcContainerInsertPart(container, part, OPC_FALSE);
+        opcContainerPart *cp=opcContainerInsertPart(container, part, false);
         if (NULL!=cp) {
             if (NULL!=relationId) {
                 rel=opcContainerFindRelationById(container, cp->relation_array, cp->relation_items, relationId);
@@ -95,19 +95,19 @@ opcRelation opcRelationFirst(opcContainer *container, opcPart part) {
     if (OPC_PART_INVALID==part) {
         return (container->relation_items>0?container->relation_array[0].relation_id:OPC_RELATION_INVALID);
     } else {
-        opcContainerPart *cp=opcContainerInsertPart(container, part, OPC_FALSE);
+        opcContainerPart *cp=opcContainerInsertPart(container, part, false);
         return (NULL!=cp && cp->relation_items>0?cp->relation_array[0].relation_id:OPC_RELATION_INVALID);
     }
 }
 
 opcRelation opcRelationNext(opcContainer *container, opcPart part, opcRelation relation) {
     opcContainerRelation *relation_array=NULL;
-    opc_uint32_t relation_items=0;
+    uint32_t relation_items=0;
     if (OPC_PART_INVALID==part) {
         relation_array=container->relation_array;
         relation_items=container->relation_items;
     } else {
-        opcContainerPart *cp=opcContainerInsertPart(container, part, OPC_FALSE);
+        opcContainerPart *cp=opcContainerInsertPart(container, part, false);
         if (NULL!=cp) {
             relation_array=cp->relation_array;
             relation_items=cp->relation_items;
@@ -126,10 +126,10 @@ opcRelation opcRelationNext(opcContainer *container, opcPart part, opcRelation r
 }
 
 
-void opcRelationGetInformation(opcContainer *container, opcPart part, opcRelation relation, const xmlChar **prefix, opc_uint32_t *counter, const xmlChar **type) {
+void opcRelationGetInformation(opcContainer *container, opcPart part, opcRelation relation, const xmlChar **prefix, uint32_t *counter, const xmlChar **type) {
     opcContainerRelation* rel=NULL;
     if (NULL!=prefix) {
-        OPC_ASSERT(OPC_CONTAINER_RELID_PREFIX(relation)>=0 && OPC_CONTAINER_RELID_PREFIX(relation)<container->relprefix_items);
+        assert(OPC_CONTAINER_RELID_PREFIX(relation)>=0 && OPC_CONTAINER_RELID_PREFIX(relation)<container->relprefix_items);
         *prefix=container->relprefix_array[OPC_CONTAINER_RELID_PREFIX(relation)].prefix;
     }
     if (NULL!=counter) {
@@ -147,7 +147,7 @@ opc_error_t opcRelationDelete(opcContainer *container, opcPart part, const xmlCh
     if (OPC_PART_INVALID==part) {
         return opcContainerDeleteRelation(container, &container->relation_array, &container->relation_items, relation);
     } else {
-        opcContainerPart *cp=opcContainerInsertPart(container, part, OPC_FALSE);
+        opcContainerPart *cp=opcContainerInsertPart(container, part, false);
         return (cp!=NULL?opcContainerDeleteRelation(container, &cp->relation_array, &cp->relation_items, relation):OPC_ERROR_STREAM);
     }
 }

@@ -46,6 +46,7 @@
  */
 #include <opc/config.h>
 #include <opc/file.h>
+#include <stdio.h>
 
 #ifndef OPC_CONTAINER_H
 #define OPC_CONTAINER_H
@@ -143,7 +144,7 @@ extern "C" {
      @param[in] mode. For more details see \ref opcContainerOpenMode.
      @return \a NULL if failed. 
      */
-    opcContainer* opcContainerOpenMem(const opc_uint8_t *data, opc_uint32_t data_len,
+    opcContainer* opcContainerOpenMem(const uint8_t *data, uint32_t data_len,
                                       opcContainerOpenMode mode, 
                                       void *userContext);
 
@@ -168,7 +169,7 @@ extern "C" {
                                      opcFileTrimCallback *iotrim,
                                      opcFileFlushCallback *ioflush,
                                      void *iocontext,
-                                     pofs_t file_size,
+                                     size_t file_size,
                                      opcContainerOpenMode mode, 
                                      void *userContext);
     

@@ -33,7 +33,10 @@
 #include <stdio.h>
 #include <libxml/xmlmemory.h>
 #include <libxml/globals.h>
-#include <plib/plib.h>
+
+#ifdef __unix__
+#include <unistd.h>
+#endif
 
 static void *opcFileOpen(const xmlChar *filename, int flags) {
     char mode[5];
@@ -79,7 +82,7 @@ static int opcFileWrite(void *iocontext, const char *buffer, int len) {
     return fwrite(buffer, sizeof(char), len, (FILE*)iocontext);
 }
 
-static opc_ofs_t opcFileSeek(void *iocontext, opc_ofs_t ofs) {
+static size_t opcFileSeek(void *iocontext, size_t ofs) {
     int ret=fseek((FILE*)iocontext, ofs, SEEK_SET);
     if (ret>=0) {
         return ftell((FILE*)iocontext);
@@ -88,7 +91,7 @@ static opc_ofs_t opcFileSeek(void *iocontext, opc_ofs_t ofs) {
     }
 }
 
-static int opcFileTrim(void *iocontext, opc_ofs_t new_size) {
+static int opcFileTrim(void *iocontext, size_t new_size) {
 #ifdef WIN32
     return _chsize(fileno((FILE*)iocontext), new_size);
 #else
@@ -100,23 +103,23 @@ static int opcFileFlush(void *iocontext) {
     return fflush((FILE*)iocontext);
 }
 
-static opc_uint32_t opcFileLength(void *iocontext) {
-    opc_ofs_t current=ftell((FILE*)iocontext);
-    OPC_ENSURE(fseek((FILE*)iocontext, 0, SEEK_END)>=0);
-    opc_ofs_t length=ftell((FILE*)iocontext);
-    OPC_ENSURE(fseek((FILE*)iocontext, current, SEEK_SET)>=0);
-    OPC_ASSERT(current==ftell((FILE*)iocontext));
+static uint32_t opcFileLength(void *iocontext) {
+    size_t current=ftell((FILE*)iocontext);
+    assert(fseek((FILE*)iocontext, 0, SEEK_END)>=0);
+    size_t length=ftell((FILE*)iocontext);
+    assert(fseek((FILE*)iocontext, current, SEEK_SET)>=0);
+    assert(current==ftell((FILE*)iocontext));
     return length;
 }
 
 
 struct __opcZipMemContext {
-    const opc_uint8_t *data;
-    opc_uint32_t data_len;
-    opc_uint32_t data_pos;    
+    const uint8_t *data;
+    uint32_t data_len;
+    uint32_t data_pos;    
 };
 
-static void *opcMemOpen(const opc_uint8_t *data, opc_uint32_t data_len) {
+static void *opcMemOpen(const uint8_t *data, uint32_t data_len) {
     struct __opcZipMemContext *mem=(struct __opcZipMemContext *)xmlMalloc(sizeof(struct __opcZipMemContext));
     memset(mem, 0, sizeof(*mem));
     mem->data_len=data_len;
@@ -134,19 +137,19 @@ static int opcMemClose(void *iocontext) {
 
 static int opcMemRead(void *iocontext, char *buffer, int len) {
     struct __opcZipMemContext *mem=(struct __opcZipMemContext*)iocontext;
-    opc_uint32_t max=(mem->data_pos+len<=mem->data_len?len:mem->data_len-mem->data_pos);
-    OPC_ASSERT(max>=0 && mem->data_pos+max<=mem->data_len);
+    uint32_t max=(mem->data_pos+len<=mem->data_len?len:mem->data_len-mem->data_pos);
+    assert(max>=0 && mem->data_pos+max<=mem->data_len);
     memcpy(buffer, mem->data+mem->data_pos, max);
     mem->data_pos+=max;    
     return max;
 }
 
 static int opcMemWrite(void *iocontext, const char *buffer, int len) {
-    OPC_ASSERT(0); // not valid for mem
+    assert(0); // not valid for mem
     return -1;
 }
 
-static opc_ofs_t opcMemSeek(void *iocontext, opc_ofs_t ofs) {
+static size_t opcMemSeek(void *iocontext, size_t ofs) {
     struct __opcZipMemContext *mem=(struct __opcZipMemContext*)iocontext;
     if (ofs<=mem->data_len) {
         mem->data_pos=ofs;
@@ -156,8 +159,8 @@ static opc_ofs_t opcMemSeek(void *iocontext, opc_ofs_t ofs) {
     return mem->data_pos;
 }
 
-static int opcMemTrim(void *iocontext, opc_ofs_t new_size) {
-    OPC_ASSERT(0); // not valid for mem
+static int opcMemTrim(void *iocontext, size_t new_size) {
+    assert(0); // not valid for mem
     return -1;
 }
 
@@ -173,7 +176,7 @@ opc_error_t opcFileInitIO(opcIO_t *io,
                           opcFileTrimCallback *iotrim,
                           opcFileFlushCallback *ioflush,
                           void *iocontext,
-                          pofs_t file_size,
+                          size_t file_size,
                           int flags) {
     opc_bzero_mem(io, sizeof(*io));
     io->_ioread=ioread;
@@ -209,7 +212,7 @@ opc_error_t opcFileInitIOFile(opcIO_t *io, const xmlChar *filename, int flags) {
     return ret;
 }
 
-opc_error_t opcFileInitIOMemory(opcIO_t *io, const opc_uint8_t *data, opc_uint32_t data_len, int flags) {
+opc_error_t opcFileInitIOMemory(opcIO_t *io, const uint8_t *data, uint32_t data_len, int flags) {
     opc_error_t ret=OPC_ERROR_NONE;
     void *iocontext=opcMemOpen(data, data_len);
     if (iocontext!=NULL) {

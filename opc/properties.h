@@ -62,7 +62,7 @@ extern "C" {
         opcDCSimpleType_t description;    /* dc:any         */
         opcDCSimpleType_t identifier;     /* dc:any         */
         opcDCSimpleType_t *keyword_array; /* cp:CT_Keywords */
-        opc_uint32_t keyword_items;
+        uint32_t keyword_items;
         opcDCSimpleType_t language;       /* dc:any         */
         xmlChar *lastModifiedBy;          /* xsd:string     */
         xmlChar *lastPrinted;             /* xsd:dateTime   */

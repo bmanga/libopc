@@ -57,7 +57,7 @@ extern "C" {
       Write \c buffer_len bytes from \c buffer to \c stream. 
       \return Returns the number of bytes written.
       */
-    opc_uint32_t opcContainerWriteOutputStream(opcContainerOutputStream* stream, const opc_uint8_t *buffer, opc_uint32_t buffer_len);
+    uint32_t opcContainerWriteOutputStream(opcContainerOutputStream* stream, const uint8_t *buffer, uint32_t buffer_len);
 
     /**
       Close the \c stream and free all associated resources.

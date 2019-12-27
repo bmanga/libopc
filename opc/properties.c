@@ -54,7 +54,7 @@ opc_error_t opcCorePropertiesCleanup(opcProperties_t *cp) {
     opcDCSimpleTypeFree(&cp->creator);
     opcDCSimpleTypeFree(&cp->description);
     opcDCSimpleTypeFree(&cp->identifier);
-    for(opc_uint32_t i=0;i<cp->keyword_items;i++) {
+    for(uint32_t i=0;i<cp->keyword_items;i++) {
         opcDCSimpleTypeFree(&cp->keyword_array[i]);
     }
     if (NULL!=cp->keyword_array) {
@@ -126,7 +126,7 @@ static void _opcCorePropertiesReadString(mceTextReader_t *r, xmlChar **v) {
 static void _opcCorePropertiesReadSimpleType(mceTextReader_t *r, opcDCSimpleType_t *v) {
     opc_bzero_mem(v, sizeof(*v));
     mce_start_attributes(r) {
-        mce_start_attribute(r, _X(xml_ns), _X("lang")) {
+        mce_start_attribute(r, BAD_CAST(xml_ns), BAD_CAST("lang")) {
             if (NULL==v->lang) {
                 v->lang=xmlStrdup(xmlTextReaderConstValue(r->reader));
             }
@@ -143,41 +143,41 @@ static void _opcCorePropertiesReadSimpleType(mceTextReader_t *r, opcDCSimpleType
 
 opc_error_t opcCorePropertiesRead(opcProperties_t *cp, opcContainer *c) {
     mceTextReader_t r;
-    if (OPC_ERROR_NONE==opcXmlReaderOpen(c, &r, _X("docProps/core.xml"), NULL, NULL, 0)) {
+    if (OPC_ERROR_NONE==opcXmlReaderOpen(c, &r, BAD_CAST("docProps/core.xml"), NULL, NULL, 0)) {
             mce_start_document(&r) {
-                mce_start_element(&r, _X(cp_ns), _X("coreProperties")) {
+                mce_start_element(&r, BAD_CAST(cp_ns), BAD_CAST("coreProperties")) {
                     mce_skip_attributes(&r);
                     mce_start_children(&r) {
-                        mce_start_element(&r, _X(cp_ns), _X("category")) {
+                        mce_start_element(&r, BAD_CAST(cp_ns), BAD_CAST("category")) {
                             _opcCorePropertiesReadString(&r, &cp->category);
                         } mce_end_element(&r);
-                        mce_start_element(&r, _X(cp_ns), _X("contentStatus")) {
+                        mce_start_element(&r, BAD_CAST(cp_ns), BAD_CAST("contentStatus")) {
                             _opcCorePropertiesReadString(&r, &cp->contentStatus);
                         } mce_end_element(&r);
-                        mce_start_element(&r, _X(dcterms_ns), _X("created")) {
+                        mce_start_element(&r, BAD_CAST(dcterms_ns), BAD_CAST("created")) {
                             _opcCorePropertiesReadString(&r, &cp->created);
                         } mce_end_element(&r);
-                        mce_start_element(&r, _X(dc_ns), _X("creator")) {
+                        mce_start_element(&r, BAD_CAST(dc_ns), BAD_CAST("creator")) {
                             _opcCorePropertiesReadSimpleType(&r, &cp->creator);
                         } mce_end_element(&r);
-                        mce_start_element(&r, _X(dc_ns), _X("description")) {
+                        mce_start_element(&r, BAD_CAST(dc_ns), BAD_CAST("description")) {
                             _opcCorePropertiesReadSimpleType(&r, &cp->description);
                         } mce_end_element(&r);
-                        mce_start_element(&r, _X(dc_ns), _X("identifier")) {
+                        mce_start_element(&r, BAD_CAST(dc_ns), BAD_CAST("identifier")) {
                             _opcCorePropertiesReadSimpleType(&r, &cp->identifier);
                         } mce_end_element(&r);
-                        mce_start_element(&r, _X(cp_ns), _X("keywords")) {
+                        mce_start_element(&r, BAD_CAST(cp_ns), BAD_CAST("keywords")) {
                             xmlChar *xml_lang=NULL;
                             mce_start_attributes(&r) {
-                                mce_start_attribute(&r, _X(xml_ns), _X("lang")) {
+                                mce_start_attribute(&r, BAD_CAST(xml_ns), BAD_CAST("lang")) {
                                     xml_lang=xmlStrdup(xmlTextReaderConstValue(r.reader));
                                 } mce_end_attribute(&r);
                             } mce_end_attributes(&r);
                             mce_start_children(&r) {
-                                mce_start_element(&r, _X(cp_ns), _X("value")) {
+                                mce_start_element(&r, BAD_CAST(cp_ns), BAD_CAST("value")) {
                                     xmlChar *value_xml_lang=NULL;
                                     mce_start_attributes(&r) {
-                                        mce_start_attribute(&r, _X(xml_ns), _X("lang")) {
+                                        mce_start_attribute(&r, BAD_CAST(xml_ns), BAD_CAST("lang")) {
                                             value_xml_lang=xmlStrdup(xmlTextReaderConstValue(r.reader));
                                         } mce_end_attribute(&r);
                                     } mce_end_attributes(&r);
@@ -194,28 +194,28 @@ opc_error_t opcCorePropertiesRead(opcProperties_t *cp, opcContainer *c) {
                             } mce_end_children(&r);
                             if (NULL!=xml_lang) { xmlFree(xml_lang); xml_lang=NULL; };
                         } mce_end_element(&r);
-                        mce_start_element(&r, _X(dc_ns), _X("language")) {
+                        mce_start_element(&r, BAD_CAST(dc_ns), BAD_CAST("language")) {
                             _opcCorePropertiesReadSimpleType(&r, &cp->language);
                         } mce_end_element(&r);
-                        mce_start_element(&r, _X(cp_ns), _X("lastModifiedBy")) {
+                        mce_start_element(&r, BAD_CAST(cp_ns), BAD_CAST("lastModifiedBy")) {
                             _opcCorePropertiesReadString(&r, &cp->lastModifiedBy);
                         } mce_end_element(&r);
-                        mce_start_element(&r, _X(cp_ns), _X("lastPrinted")) {
+                        mce_start_element(&r, BAD_CAST(cp_ns), BAD_CAST("lastPrinted")) {
                             _opcCorePropertiesReadString(&r, &cp->lastPrinted);
                         } mce_end_element(&r);
-                        mce_start_element(&r, _X(dcterms_ns), _X("modified")) {
+                        mce_start_element(&r, BAD_CAST(dcterms_ns), BAD_CAST("modified")) {
                             _opcCorePropertiesReadString(&r, &cp->modified);
                         } mce_end_element(&r);
-                        mce_start_element(&r, _X(cp_ns), _X("revision")) {
+                        mce_start_element(&r, BAD_CAST(cp_ns), BAD_CAST("revision")) {
                             _opcCorePropertiesReadString(&r, &cp->revision);
                         } mce_end_element(&r);
-                        mce_start_element(&r, _X(dc_ns), _X("subject")) {
+                        mce_start_element(&r, BAD_CAST(dc_ns), BAD_CAST("subject")) {
                             _opcCorePropertiesReadSimpleType(&r, &cp->subject);
                         } mce_end_element(&r);
-                        mce_start_element(&r, _X(dc_ns), _X("title")) {
+                        mce_start_element(&r, BAD_CAST(dc_ns), BAD_CAST("title")) {
                             _opcCorePropertiesReadSimpleType(&r, &cp->title);
                         } mce_end_element(&r);
-                        mce_start_element(&r, _X(cp_ns), _X("version")) {
+                        mce_start_element(&r, BAD_CAST(cp_ns), BAD_CAST("version")) {
                             _opcCorePropertiesReadString(&r, &cp->version);
                         } mce_end_element(&r);
                     } mce_end_children(&r);
@@ -230,7 +230,7 @@ static void _opcCorePropertiesWriteString(mceTextWriter *w, const xmlChar *ns, c
     if (NULL!=value) {
         mceTextWriterStartElement(w, ns, name);
         if (NULL!=type) {
-            mceTextWriterAttributeF(w, _X(xsi_ns), _X("type"), (const char *)type);
+            mceTextWriterAttributeF(w, BAD_CAST(xsi_ns), BAD_CAST("type"), (const char *)type);
         }
         mceTextWriterWriteString(w, value);
         mceTextWriterEndElement(w, ns, name);
@@ -241,7 +241,7 @@ static void _opcCorePropertiesWriteSimpleType(mceTextWriter *w, const xmlChar *n
     if (NULL!=value->str) {
         mceTextWriterStartElement(w, ns, name);
         if (NULL!=value->lang) {
-            mceTextWriterAttributeF(w, _X(xml_ns), _X("lang"), (const char *)value->lang);
+            mceTextWriterAttributeF(w, BAD_CAST(xml_ns), BAD_CAST("lang"), (const char *)value->lang);
         }
         mceTextWriterWriteString(w, value->str);
         mceTextWriterEndElement(w, ns, name);
@@ -249,41 +249,41 @@ static void _opcCorePropertiesWriteSimpleType(mceTextWriter *w, const xmlChar *n
 }
 
 opc_error_t opcCorePropertiesWrite(opcProperties_t *cp, opcContainer *c) {
-    opcPart part=opcPartCreate(c, _X("docProps/core.xml"), _X("application/vnd.openxmlformats-package.core-properties+xml"), 0);
+    opcPart part=opcPartCreate(c, BAD_CAST("docProps/core.xml"), BAD_CAST("application/vnd.openxmlformats-package.core-properties+xml"), 0);
     if (NULL!=part) {
         mceTextWriter *w=mceTextWriterOpen(c, part, OPC_COMPRESSIONOPTION_SUPERFAST);
         if (NULL!=w) {
             mceTextWriterStartDocument(w);
-            mceTextWriterRegisterNamespace(w, _X(cp_ns), _X("cp"), MCE_DEFAULT);
-            mceTextWriterRegisterNamespace(w, _X(dc_ns), _X("dc"), MCE_DEFAULT);
-            mceTextWriterRegisterNamespace(w, _X(dcterms_ns), _X("dcterms"), MCE_DEFAULT);
-            mceTextWriterRegisterNamespace(w, _X(xsi_ns), _X("xsi"), MCE_DEFAULT);
-            mceTextWriterStartElement(w, _X(cp_ns), _X("coreProperties"));
-            _opcCorePropertiesWriteString(w, _X(cp_ns), _X("category"), cp->category, NULL);
-            _opcCorePropertiesWriteString(w, _X(cp_ns), _X("contentStatus"), cp->contentStatus, NULL);
-            _opcCorePropertiesWriteString(w, _X(dcterms_ns), _X("created"), cp->created, _X("dcterms:W3CDTF"));
-            _opcCorePropertiesWriteSimpleType(w, _X(dc_ns), _X("creator"), &cp->creator);
-            _opcCorePropertiesWriteSimpleType(w, _X(dc_ns), _X("description"), &cp->description);
-            _opcCorePropertiesWriteSimpleType(w, _X(dc_ns), _X("identifier"), &cp->identifier);
+            mceTextWriterRegisterNamespace(w, BAD_CAST(cp_ns), BAD_CAST("cp"), MCE_DEFAULT);
+            mceTextWriterRegisterNamespace(w, BAD_CAST(dc_ns), BAD_CAST("dc"), MCE_DEFAULT);
+            mceTextWriterRegisterNamespace(w, BAD_CAST(dcterms_ns), BAD_CAST("dcterms"), MCE_DEFAULT);
+            mceTextWriterRegisterNamespace(w, BAD_CAST(xsi_ns), BAD_CAST("xsi"), MCE_DEFAULT);
+            mceTextWriterStartElement(w, BAD_CAST(cp_ns), BAD_CAST("coreProperties"));
+            _opcCorePropertiesWriteString(w, BAD_CAST(cp_ns), BAD_CAST("category"), cp->category, NULL);
+            _opcCorePropertiesWriteString(w, BAD_CAST(cp_ns), BAD_CAST("contentStatus"), cp->contentStatus, NULL);
+            _opcCorePropertiesWriteString(w, BAD_CAST(dcterms_ns), BAD_CAST("created"), cp->created, BAD_CAST("dcterms:W3CDTF"));
+            _opcCorePropertiesWriteSimpleType(w, BAD_CAST(dc_ns), BAD_CAST("creator"), &cp->creator);
+            _opcCorePropertiesWriteSimpleType(w, BAD_CAST(dc_ns), BAD_CAST("description"), &cp->description);
+            _opcCorePropertiesWriteSimpleType(w, BAD_CAST(dc_ns), BAD_CAST("identifier"), &cp->identifier);
             if (cp->keyword_items>0) {
-                mceTextWriterStartElement(w, _X(cp_ns), _X("keywords"));
-                for(opc_uint32_t i=0;i<cp->keyword_items;i++) {
-                    _opcCorePropertiesWriteSimpleType(w, _X(cp_ns), _X("value"), &cp->keyword_array[i]);
+                mceTextWriterStartElement(w, BAD_CAST(cp_ns), BAD_CAST("keywords"));
+                for(uint32_t i=0;i<cp->keyword_items;i++) {
+                    _opcCorePropertiesWriteSimpleType(w, BAD_CAST(cp_ns), BAD_CAST("value"), &cp->keyword_array[i]);
                     if (i+1<cp->keyword_items) {
-                        mceTextWriterWriteString(w, _X(";"));
+                        mceTextWriterWriteString(w, BAD_CAST(";"));
                     }
                 }
-                mceTextWriterEndElement(w, _X(cp_ns), _X("keywords"));
+                mceTextWriterEndElement(w, BAD_CAST(cp_ns), BAD_CAST("keywords"));
             }
-            _opcCorePropertiesWriteSimpleType(w, _X(dc_ns), _X("language"), &cp->language);
-            _opcCorePropertiesWriteString(w, _X(cp_ns), _X("lastModifiedBy"), cp->lastModifiedBy, NULL);
-            _opcCorePropertiesWriteString(w, _X(cp_ns), _X("lastPrinted"), cp->lastPrinted, _X("dcterms:W3CDTF"));
-            _opcCorePropertiesWriteString(w, _X(dcterms_ns), _X("modified"), cp->modified, _X("dcterms:W3CDTF"));
-            _opcCorePropertiesWriteString(w, _X(cp_ns), _X("revision"), cp->revision, NULL);
-            _opcCorePropertiesWriteSimpleType(w, _X(dc_ns), _X("subject"), &cp->subject);
-            _opcCorePropertiesWriteSimpleType(w, _X(dc_ns), _X("title"), &cp->title);
-            _opcCorePropertiesWriteString(w, _X(cp_ns), _X("version"), cp->version, NULL);
-            mceTextWriterEndElement(w, _X(cp_ns), _X("coreProperties"));
+            _opcCorePropertiesWriteSimpleType(w, BAD_CAST(dc_ns), BAD_CAST("language"), &cp->language);
+            _opcCorePropertiesWriteString(w, BAD_CAST(cp_ns), BAD_CAST("lastModifiedBy"), cp->lastModifiedBy, NULL);
+            _opcCorePropertiesWriteString(w, BAD_CAST(cp_ns), BAD_CAST("lastPrinted"), cp->lastPrinted, BAD_CAST("dcterms:W3CDTF"));
+            _opcCorePropertiesWriteString(w, BAD_CAST(dcterms_ns), BAD_CAST("modified"), cp->modified, BAD_CAST("dcterms:W3CDTF"));
+            _opcCorePropertiesWriteString(w, BAD_CAST(cp_ns), BAD_CAST("revision"), cp->revision, NULL);
+            _opcCorePropertiesWriteSimpleType(w, BAD_CAST(dc_ns), BAD_CAST("subject"), &cp->subject);
+            _opcCorePropertiesWriteSimpleType(w, BAD_CAST(dc_ns), BAD_CAST("title"), &cp->title);
+            _opcCorePropertiesWriteString(w, BAD_CAST(cp_ns), BAD_CAST("version"), cp->version, NULL);
+            mceTextWriterEndElement(w, BAD_CAST(cp_ns), BAD_CAST("coreProperties"));
             mceTextWriterEndDocument(w);
             mceTextWriterFree(w);
         }

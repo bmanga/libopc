@@ -37,12 +37,12 @@ static opcPart opcPartOpenEx(opcContainer *container,
                     const xmlChar *absolutePath, 
                     const xmlChar *type,                         
                     int flags,
-                    opc_bool_t create_part) {
+                    bool create_part) {
     opcContainerPart *part=opcContainerInsertPart(container, (absolutePath[0]=='/'?absolutePath+1:absolutePath), create_part);
     if (NULL!=part) {
         if (create_part && NULL==part->type) {
-            opcContainerType *ct=insertType(container, type, OPC_TRUE);
-            OPC_ASSERT(NULL!=ct && 0==xmlStrcmp(ct->type, type));
+            opcContainerType *ct=insertType(container, type, true);
+            assert(NULL!=ct && 0==xmlStrcmp(ct->type, type));
             part->type=ct->type;
         }
         return part->name;
@@ -55,23 +55,23 @@ opcPart opcPartFind(opcContainer *container,
                     const xmlChar *absolutePath, 
                     const xmlChar *type,
                     int flags) {
-    return opcPartOpenEx(container, absolutePath, type, flags, OPC_FALSE);
+    return opcPartOpenEx(container, absolutePath, type, flags, false);
 }
 
 opcPart opcPartCreate(opcContainer *container, 
                     const xmlChar *absolutePath, 
                     const xmlChar *type,
                     int flags) {
-    return opcPartOpenEx(container, absolutePath, type, flags, OPC_TRUE);
+    return opcPartOpenEx(container, absolutePath, type, flags, true);
 }
 
 const xmlChar *opcPartGetType(opcContainer *c,  opcPart part) {
-    return opcPartGetTypeEx(c, part, OPC_FALSE);
+    return opcPartGetTypeEx(c, part, false);
 }
 
-const xmlChar *opcPartGetTypeEx(opcContainer *c, opcPart part, opc_bool_t override_only) {
-   OPC_ASSERT(OPC_PART_INVALID!=part);
-    opcContainerPart *cp=(OPC_PART_INVALID!=part?opcContainerInsertPart(c, part, OPC_FALSE):NULL);
+const xmlChar *opcPartGetTypeEx(opcContainer *c, opcPart part, bool override_only) {
+   assert(OPC_PART_INVALID!=part);
+    opcContainerPart *cp=(OPC_PART_INVALID!=part?opcContainerInsertPart(c, part, false):NULL);
     const xmlChar *type=(NULL!=cp?cp->type:NULL);
     if (NULL==type && NULL!=cp && !override_only) {
         xmlChar *name=cp->name;
@@ -79,7 +79,7 @@ const xmlChar *opcPartGetTypeEx(opcContainer *c, opcPart part, opc_bool_t overri
         while(l>0 && name[l]!='.') l--;
         if (l>0) { 
             l++;
-            opcContainerExtension *ct=opcContainerInsertExtension(c, name+l, OPC_FALSE);
+            opcContainerExtension *ct=opcContainerInsertExtension(c, name+l, false);
             type=(NULL!=ct?ct->type:NULL);
         } else {
             type=NULL; // no extension
@@ -99,16 +99,16 @@ opcPart opcPartGetFirst(opcContainer *container) {
 }
 
 opcPart opcPartGetNext(opcContainer *container, opcPart part) {
-    opcContainerPart *cp=(NULL!=container?opcContainerInsertPart(container, part, OPC_FALSE):NULL);
+    opcContainerPart *cp=(NULL!=container?opcContainerInsertPart(container, part, false):NULL);
     if (NULL!=cp) {
         do { cp++; } while(cp<container->part_array+container->part_items && -1==cp->first_segment_id);
     }
     return (NULL!=cp && cp<container->part_array+container->part_items?cp->name:NULL);
 }
 
-opc_ofs_t opcPartGetSize(opcContainer *c, opcPart part) {
-   OPC_ASSERT(OPC_PART_INVALID!=part);
-    opcContainerPart *cp=(OPC_PART_INVALID!=part?opcContainerInsertPart(c, part, OPC_FALSE):NULL);
+size_t opcPartGetSize(opcContainer *c, opcPart part) {
+   assert(OPC_PART_INVALID!=part);
+    opcContainerPart *cp=(OPC_PART_INVALID!=part?opcContainerInsertPart(c, part, false):NULL);
     if (NULL!=cp && cp->first_segment_id>=0 && cp->first_segment_id<c->storage->segment_items) {
         return c->storage->segment_array[cp->first_segment_id].uncompressed_size;
     } else {

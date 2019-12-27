@@ -36,7 +36,6 @@ Helper functions needed by mce/textreader.h and mce/textwriter.h to implement MC
 - mceQNameLevelPush() and mceQNameLevelPopIfMatch() maintain a stack of mceQNameLevel_t tuples.
 - mceCtxInit(), mceCtxCleanup() and mceCtxUnderstandsNamespace() manage a context which holds all information needed to do MCE proprocessing.
  */
-#include <mce/config.h>
 
 #ifndef MCE_HELPER_H
 #define MCE_HELPER_H
@@ -51,8 +50,8 @@ extern "C" {
     typedef struct MCE_QNAME_LEVEL {
         xmlChar *ns;
         xmlChar *ln;
-        puint32_t level;
-        puint32_t flag; // used by mceTextWriter
+        uint32_t level;
+        uint32_t flag; // used by mceTextWriter
     } mceQNameLevel_t;
 
     /**
@@ -67,8 +66,8 @@ extern "C" {
      Represents an intervall of levels which are "skipped" i.e. ignored.
      */
     typedef struct MCE_SKIP_ITEM {
-        puint32_t level_start;
-        puint32_t level_end;
+        uint32_t level_start;
+        uint32_t level_end;
         mceSkipState_t state;
     } mceSkipItem_t;
 
@@ -77,8 +76,8 @@ extern "C" {
     */
     typedef struct MCE_QNAME_LEVEL_SET {
         mceQNameLevel_t *list_array;
-        puint32_t list_items;
-        puint32_t max_level;
+        uint32_t list_items;
+        uint32_t max_level;
     } mceQNameLevelSet_t;
 
     /**
@@ -86,7 +85,7 @@ extern "C" {
      */
     typedef struct MCE_SKIP_STACK {
         mceSkipItem_t *stack_array;
-        puint32_t stack_items;
+        uint32_t stack_items;
     } mceSkipStack_t;
 
 
@@ -113,30 +112,30 @@ extern "C" {
 #endif
         mceSkipStack_t skip_stack;
         mceError_t error;
-        pbool_t mce_disabled;        
-        puint32_t suspended_level;
+        bool mce_disabled;        
+        uint32_t suspended_level;
     } mceCtx_t;
 
     /**
       Add a new tiple (ns, ln, level) to the triple set \c qname_level_set.
       The \c ns_sub string is optional and will not be touched.
     */
-    pbool_t mceQNameLevelAdd(mceQNameLevelSet_t *qname_level_set, const xmlChar *ns, const xmlChar *ln, puint32_t level);
+    bool mceQNameLevelAdd(mceQNameLevelSet_t *qname_level_set, const xmlChar *ns, const xmlChar *ln, uint32_t level);
 
     /**
       Lookup a tiple (ns, ln, level) via \c ns and \c ln. If \c ignore_ln is PTRUE then the first tiple matching \c ns will be returned.
     */
-    mceQNameLevel_t* mceQNameLevelLookup(mceQNameLevelSet_t *qname_level_set, const xmlChar *ns, const xmlChar *ln, pbool_t ignore_ln);
+    mceQNameLevel_t* mceQNameLevelLookup(mceQNameLevelSet_t *qname_level_set, const xmlChar *ns, const xmlChar *ln, bool ignore_ln);
 
     /**
       Remove all triples (ns, ln, level) where the level greater or equal to \c level.
     */
-    pbool_t mceQNameLevelCleanup(mceQNameLevelSet_t *qname_level_set, puint32_t level);
+    bool mceQNameLevelCleanup(mceQNameLevelSet_t *qname_level_set, uint32_t level);
 
     /**
       Push a new skip intervall (level_start, level_end, state) on the stack \c skip_stack.
     */
-    pbool_t mceSkipStackPush(mceSkipStack_t *skip_stack, puint32_t level_start, puint32_t level_end, mceSkipState_t state);
+    bool mceSkipStackPush(mceSkipStack_t *skip_stack, uint32_t level_start, uint32_t level_end, mceSkipState_t state);
 
     /**
       Pop the intervall (ns, ln, level) from the stack \c qname_level_array.
@@ -151,27 +150,27 @@ extern "C" {
     /**
      Returns TRUE, if the \c level is in the top skip intervall.
      */
-    pbool_t mceSkipStackSkip(mceSkipStack_t *skip_stack, puint32_t level);
+    bool mceSkipStackSkip(mceSkipStack_t *skip_stack, uint32_t level);
 
     /**
       Initialize the mceCtx_t \c ctx.
     */
-    pbool_t mceCtxInit(mceCtx_t *ctx);
+    bool mceCtxInit(mceCtx_t *ctx);
 
     /**
       Cleanup, i.e. release all resourced from the mceCtx_t \c ctx.
     */
-    pbool_t mceCtxCleanup(mceCtx_t *ctx);
+    bool mceCtxCleanup(mceCtx_t *ctx);
 
     /**
       Register the namespace \ns in \c ctx.
     */
-    pbool_t mceCtxUnderstandsNamespace(mceCtx_t *ctx, const xmlChar *ns);
+    bool mceCtxUnderstandsNamespace(mceCtx_t *ctx, const xmlChar *ns);
 
     /**
      Register the namespace \ns in \c ctx.
      */
-    pbool_t mceCtxSuspendProcessing(mceCtx_t *ctx, const xmlChar *ns, const xmlChar *ln);
+    bool mceCtxSuspendProcessing(mceCtx_t *ctx, const xmlChar *ns, const xmlChar *ln);
     
 
 
@@ -179,7 +178,7 @@ extern "C" {
     /**
     Subsume namespace \c ns_new with \c ns_old.
      */
-    pbool_t mceCtxSubsumeNamespace(mceCtx_t *ctx, const xmlChar *prefix_new, const xmlChar *ns_new, const xmlChar *ns_old);
+    bool mceCtxSubsumeNamespace(mceCtx_t *ctx, const xmlChar *prefix_new, const xmlChar *ns_new, const xmlChar *ns_old);
 #endif
 
 #ifdef __cplusplus
