@@ -6,7 +6,7 @@ find_package(LibXml2)
 find_package(ZLIB)
 
 add_library(opc2
-	opc/config.h
+	config.h
 	opc/container.c
 	opc/container.h
 	opc/file.c
@@ -32,7 +32,18 @@ add_library(opc2
 	opc/xmlwriter.c
 	opc/xmlwriter.h
 	opc/zip.c
-	opc/zip.h)
+	opc/zip.h
+	mce/helper.c
+	mce/helper.h
+	mce/textreader.c
+	mce/textreader.h
+	mce/textwriter.c
+	mce/textwriter.h)
 
 target_include_directories(opc2 PUBLIC . ${LIBXML2_INCLUDE_DIR})
 target_link_libraries(opc2 PRIVATE ${LIBXML2_LIBRARIES} ZLIB::ZLIB)
+
+option (ENABLE_SAMPLES "Enable all targets in the sample/ folder" False)
+if(ENABLE_SAMPLES)
+	add_subdirectory(sample)
+endif()
