@@ -998,7 +998,7 @@ static opcContainer *opcContainerLoadFromZip(opcContainer *c) {
                                         opcContainerType*ct=insertType(c, type, true);
                                         mce_error(&reader, NULL==ct, MCE_ERROR_MEMORY, NULL);
                                         mce_error_strictf(&reader, '/'!=name[0], MCE_ERROR_MEMORY, "Part %s MUST start with a '/'", name);
-                                        opcContainerPart *part=opcContainerInsertPart(c, (name[0]=='/'?name+1:name), false);
+                                        opcContainerPart *part=opcContainerInsertPart(c, (name[0]=='/'?name+1:name), true);
                                         mce_error_strictf(&reader, NULL==part, MCE_ERROR_MEMORY, "Part %s does not exist.", name);
                                         if (NULL!=part) {
                                             part->type=ct->type;
