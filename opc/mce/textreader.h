@@ -49,11 +49,9 @@ extern "C" {
 } /* extern "C" */
 #endif
 
-
-#include <opc/opc.h>
-#include <mce/helper.h>
 #include <libxml/xmlwriter.h>
-
+#include <opc/mce/helper.h>
+#include <opc/opc.h>
 
 #ifdef __cplusplus
 extern "C" {

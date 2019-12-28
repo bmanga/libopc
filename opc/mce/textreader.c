@@ -29,8 +29,7 @@
  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED 
  OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#include <mce/textreader.h>
-
+#include <opc/mce/textreader.h>
 
 int mceTextReaderInit(mceTextReader_t *mceTextReader, xmlTextReaderPtr reader) {
     memset(mceTextReader, 0, sizeof(*mceTextReader));

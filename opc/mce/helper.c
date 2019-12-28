@@ -1,5 +1,5 @@
-#include <mce/helper.h>
 #include <libxml/xmlmemory.h>
+#include <opc/mce/helper.h>
 
 static bool mceQNameLevelLookupEx(mceQNameLevelSet_t *qname_level_set, const xmlChar *ns, const xmlChar *ln, uint32_t *pos, bool ignore_ln) {
     uint32_t i=0;

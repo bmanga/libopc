@@ -29,7 +29,7 @@
  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED 
  OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#include <mce/textwriter.h>
+#include <opc/mce/textwriter.h>
 
 struct MCE_TEXTWRITER_STRUCT {
     xmlTextWriterPtr writer;

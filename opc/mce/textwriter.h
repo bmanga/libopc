@@ -34,7 +34,7 @@
 
 */
 #include <libxml/xmlwriter.h>
-#include <mce/helper.h>
+#include <opc/mce/helper.h>
 
 #ifndef MCE_TEXTWRITER_H
 #define MCE_TEXTWRITER_H

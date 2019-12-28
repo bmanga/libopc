@@ -33,14 +33,14 @@ add_library(opc2
 	opc/xmlwriter.h
 	opc/zip.c
 	opc/zip.h
-	mce/helper.c
-	mce/helper.h
-	mce/textreader.c
-	mce/textreader.h
-	mce/textwriter.c
-	mce/textwriter.h)
+  opc/mce/helper.c
+  opc/mce/helper.h
+  opc/mce/textreader.c
+  opc/mce/textreader.h
+  opc/mce/textwriter.c
+  opc/mce/textwriter.h)
 
-target_include_directories(opc2 PUBLIC . ${LIBXML2_INCLUDE_DIR})
+target_include_directories(opc2 PUBLIC . ${LIBXML2_INCLUDE_DIR} opc/)
 target_link_libraries(opc2 PRIVATE ${LIBXML2_LIBRARIES} ZLIB::ZLIB)
 
 option (ENABLE_SAMPLES "Enable all targets in the sample/ folder" False)
