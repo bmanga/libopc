@@ -49,7 +49,7 @@ int main( int argc, const char* argv[] )
     time_t start_time=time(NULL);
     FILE *file=NULL;
     int writer_indent=0;
-    pbool_t reader_mce=true;
+    bool reader_mce=true;
     const char *fileName=NULL;
     for(int i=1;i<argc;i++) {
         if ((0==xmlStrcmp(BAD_CAST("--understands"), BAD_CAST(argv[i])) || 0==xmlStrcmp(BAD_CAST("-u"), BAD_CAST(argv[i]))) && i+1<argc) {
@@ -97,7 +97,7 @@ int main( int argc, const char* argv[] )
     time_t end_time=time(NULL);
     fprintf(stderr, "time %.2lfsec\n", difftime(end_time, start_time));
 #ifdef WIN32
-    OPC_ASSERT(!_CrtDumpMemoryLeaks());
+    assert(!_CrtDumpMemoryLeaks());
 #endif
     return ret;
 }

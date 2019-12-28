@@ -34,7 +34,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
-config.h>/zip.h> 
 #include <zlib.h> // for crc32 function
 #ifdef WIN32
 #include <crtdbg.h>
@@ -79,7 +78,7 @@ opc_error_t loadSegment(void *iocontext,
         // enable this to very the CRC checksums
         bool ok=false;
         if (0==open(iocontext)) {
-            opc_uint32_t crc=0;
+            uint32_t crc=0;
             char buf[OPC_DEFLATE_BUFFER_SIZE];
             int ret=0;
             while((ret=read(iocontext, buf, sizeof(buf)))>0) {
@@ -124,7 +123,7 @@ int main( int argc, const char* argv[] )
     time_t end_time=time(NULL);
     fprintf(stderr, "time %.2lfsec\n", difftime(end_time, start_time));
 #ifdef WIN32
-    OPC_ASSERT(!_CrtDumpMemoryLeaks());
+    assert(!_CrtDumpMemoryLeaks());
 #endif
     return (OPC_ERROR_NONE==err?0:3);
 }

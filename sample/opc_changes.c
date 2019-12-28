@@ -117,7 +117,7 @@ static void dumpText(context_t *ctx, mceTextReader_t *reader, int level, changem
             mce_skip_attributes(reader);
             mce_start_children(reader) {
                 mce_start_text(reader) {
-                    OPC_ASSERT(NULL!=textMode && textMode->deleted);
+                    assert(NULL!=textMode && textMode->deleted);
                     text(ctx, xmlTextReaderConstValue(reader->reader), textMode);
                 } mce_end_text(reader);
             } mce_end_children(reader);
@@ -277,7 +277,7 @@ int main( int argc, const char* argv[] )
     parseText(BAD_CAST(argv[1]), paragraph_callback, stdout);
     opcFreeLibrary();
 #ifdef WIN32
-    OPC_ASSERT(!_CrtDumpMemoryLeaks());
+    assert(!_CrtDumpMemoryLeaks());
 #endif
     return 0;
 }

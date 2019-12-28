@@ -57,7 +57,7 @@ int main( int argc, const char* argv[] )
         opcPart part=opcPartFind(c, BAD_CAST(argv[2]), NULL, 0);
         if (OPC_PART_INVALID!=part) {
             const xmlChar *type=opcPartGetType(c, part);
-            opc_uint32_t type_len=xmlStrlen(type);
+            uint32_t type_len=xmlStrlen(type);
             bool is_xml=NULL!=type && type_len>=3 && 'x'==type[type_len-3] && 'm'==type[type_len-2] && 'l'==type[type_len-1];
             fprintf(stderr, "type=%s is_xml=%i\n", type, is_xml);
             if (is_xml) {
@@ -74,10 +74,10 @@ int main( int argc, const char* argv[] )
             } else  {
                 opcContainerInputStream *stream=opcContainerOpenInputStream(c, part);
                 if (NULL!=stream) {
-                    opc_uint32_t ret=0;
-                    opc_uint8_t buf[100];
+                    uint32_t ret=0;
+                    uint8_t buf[100];
                     while((ret=opcContainerReadInputStream(stream, buf, sizeof(buf)))>0) {
-                        fwrite(buf, sizeof(opc_uint8_t), ret, stdout);
+                        fwrite(buf, sizeof(uint8_t), ret, stdout);
                     }
                     opcContainerCloseInputStream(stream);
                 }
@@ -87,7 +87,7 @@ int main( int argc, const char* argv[] )
     }
     opcFreeLibrary();
 #ifdef WIN32
-    OPC_ASSERT(!_CrtDumpMemoryLeaks());
+    assert(!_CrtDumpMemoryLeaks());
 #endif
     return 0;
 }

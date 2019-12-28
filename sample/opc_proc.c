@@ -47,14 +47,14 @@ int main( int argc, const char* argv[] )
     if (OPC_ERROR_NONE==opcInitLibrary() && argc>1) {
         opcContainer *c=NULL;
         if (NULL!=(c=opcContainerOpen(BAD_CAST(argv[1]), OPC_OPEN_READ_WRITE, NULL, NULL))) {
-            pbool_t closed=false;
-            for(puint32_t i=2;i<argc;i++) {
+            bool closed=false;
+            for(uint32_t i=2;i<argc;i++) {
                 if (xmlStrcmp(BAD_CAST(argv[i]), BAD_CAST("--dump"))==0) {
                     opcContainerDump(c, stdout);
                 } else if (xmlStrcmp(BAD_CAST(argv[i]), BAD_CAST("--create"))==0 && i+4<argc) {
                     const xmlChar *part_name=BAD_CAST(argv[i+1]);
                     const xmlChar *part_type=BAD_CAST(argv[i+2]);
-                    const puint32_t part_flags=atoi(argv[i+3]);
+                    const uint32_t part_flags=atoi(argv[i+3]);
                     if (xmlStrcasecmp(part_type, BAD_CAST("NULL"))==0) {
                         part_type=NULL;
                     }
@@ -66,8 +66,8 @@ int main( int argc, const char* argv[] )
                             FILE *in=fopen(filename, "rb");
                             if (NULL!=in) {
                                 int ret=0;
-                                opc_uint8_t buf[100];
-                                while((ret=fread(buf, sizeof(opc_uint8_t), sizeof(buf), in))>0) {
+                                uint8_t buf[100];
+                                while((ret=fread(buf, sizeof(uint8_t), sizeof(buf), in))>0) {
                                     opcContainerWriteOutputStream(stream, buf, ret);
                                 }
                                 fclose(in);
@@ -103,7 +103,7 @@ int main( int argc, const char* argv[] )
     time_t end_time=time(NULL);
     fprintf(stderr, "time %.2lfsec\n", difftime(end_time, start_time));
 #ifdef WIN32
-    OPC_ASSERT(!_CrtDumpMemoryLeaks());
+    assert(!_CrtDumpMemoryLeaks());
 #endif
     return (OPC_ERROR_NONE==err?0:3);	
 }

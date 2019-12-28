@@ -49,13 +49,13 @@
 #include <crtdbg.h>
 #endif
 
-static void add_visited_part(opcPart **visited_parts_array, opc_uint32_t *visited_parts_count, opcPart part) {
+static void add_visited_part(opcPart **visited_parts_array, uint32_t *visited_parts_count, opcPart part) {
     *visited_parts_array=(opcPart*)xmlRealloc(*visited_parts_array, sizeof(opcPart)*(*visited_parts_count+1));
     (*visited_parts_array)[(*visited_parts_count)++]=part;
 }
 
-static bool is_visited_part(opcPart *visited_parts_array, opc_uint32_t visited_parts_count, opcPart part) {
-    for(opc_uint32_t i=0;i<visited_parts_count;i++) {
+static bool is_visited_part(opcPart *visited_parts_array, uint32_t visited_parts_count, opcPart part) {
+    for(uint32_t i=0;i<visited_parts_count;i++) {
         if (visited_parts_array[i]==part) {
             return true;
         }
@@ -64,9 +64,9 @@ static bool is_visited_part(opcPart *visited_parts_array, opc_uint32_t visited_p
 }
 
 
-static void normalize_name(char *dest, const xmlChar *src, opc_uint32_t len) {
-    opc_uint32_t i=0;
-    opc_uint32_t j=0;
+static void normalize_name(char *dest, const xmlChar *src, uint32_t len) {
+    uint32_t i=0;
+    uint32_t j=0;
     while(j<len && 0!=src[i]) {
         if (src[i]=='/' || src[i]=='.' || src[i]=='-' || src[i]=='_' || src[i]=='[' || src[i]==']') {
             dest[j++]='_'; i++;
@@ -80,8 +80,8 @@ static void normalize_name(char *dest, const xmlChar *src, opc_uint32_t len) {
 }
 
 static xmlChar *xmlStrEscape(const xmlChar *str) {
-    opc_uint32_t i=0;
-    opc_uint32_t a=0;
+    uint32_t i=0;
+    uint32_t a=0;
     for(;str[i]!=0;i++) {
         if ('\\'==str[i]) {
             a++;
@@ -91,7 +91,7 @@ static xmlChar *xmlStrEscape(const xmlChar *str) {
         return xmlStrdup(str);
     } else {
         xmlChar *ret = (xmlChar *) xmlMalloc((i + a + 1) * sizeof(xmlChar));
-        for(opc_uint32_t j=0, k=0;j<=i;j++) {
+        for(uint32_t j=0, k=0;j<=i;j++) {
             if ('\\'==str[j]) { ret[k++]='\\'; ret[k++]='\\';} else ret[k++]=str[j];
         }
         return ret;
@@ -103,7 +103,7 @@ static void generate_relations(opcContainer *c, FILE *out, opcPart root) {
        ;OPC_RELATION_INVALID!=rel
        ;rel=opcRelationNext(c, root, rel)) {
             const xmlChar *prefix=NULL;
-            opc_uint32_t counter=-1;
+            uint32_t counter=-1;
             const xmlChar *type=NULL;
             opcRelationGetInformation(c, root, rel, &prefix, &counter, &type);
             char buf[20]="";
@@ -134,13 +134,13 @@ static void generate_relations(opcContainer *c, FILE *out, opcPart root) {
 }
 
 static void generate_binary_data(opcContainer *c, FILE *out, opcContainerInputStream *in) {
-    fprintf(out, "              static opc_uint8_t data[]={\n");
-    opc_uint8_t buf[100];
-    opc_uint32_t len=0;
+    fprintf(out, "              static uint8_t data[]={\n");
+    uint8_t buf[100];
+    uint32_t len=0;
     char cont=' ';
     while((len=opcContainerReadInputStream(in, buf, sizeof(buf)))>0) {
         fprintf(out, "              ");
-        for(opc_uint32_t i=0;i<len;i++) {
+        for(uint32_t i=0;i<len;i++) {
             fprintf(out, "%c 0x%02X", cont, buf[i]);
             cont=',';
         }
@@ -215,7 +215,7 @@ static void generate_parts(opcContainer *c, FILE *out) {
             fprintf(out, "          opcContainerOutputStream *out=opcContainerCreateOutputStream(c, ret, OPC_COMPRESSIONOPTION_NORMAL);\n");
             fprintf(out, "          if (NULL!=out) {\n");
             const xmlChar *type=opcPartGetType(c, part);
-            opc_uint32_t type_len=(NULL!=type?xmlStrlen(type):0);
+            uint32_t type_len=(NULL!=type?xmlStrlen(type):0);
             if (type_len>0 && type[type_len-3]=='x' && type[type_len-2]=='m' && type[type_len-1]=='l') {
                 generate_xml_data(c, out, part);
             } else {
@@ -223,7 +223,7 @@ static void generate_parts(opcContainer *c, FILE *out) {
                     opcContainerInputStream *in=opcContainerOpenInputStream(c, part);
                     if (NULL!=in) {
                         generate_binary_data(c, out, in);
-                        fprintf(out, "              opcContainerWriteOutputStream(out, (const opc_uint8_t*)data, sizeof(data));\n");
+                        fprintf(out, "              opcContainerWriteOutputStream(out, (const uint8_t*)data, sizeof(data));\n");
                     }
                     opcContainerCloseInputStream(in);
                 }
@@ -241,7 +241,7 @@ static void generate_parts(opcContainer *c, FILE *out) {
 }
 
 
-static void visit_all_parts(opcContainer *c, opcPart root, opcPart **visited_parts_array, opc_uint32_t *visited_parts_count) {
+static void visit_all_parts(opcContainer *c, opcPart root, opcPart **visited_parts_array, uint32_t *visited_parts_count) {
     for(opcRelation rel=opcRelationFirst(c, root)
        ;OPC_RELATION_INVALID!=rel
        ;rel=opcRelationNext(c, root, rel)) {
@@ -257,7 +257,7 @@ static void visit_all_parts(opcContainer *c, opcPart root, opcPart **visited_par
 
 static void generate_weak_parts(opcContainer *c, FILE *out) {
     opcPart *visited_parts_array=NULL;
-    opc_uint32_t visited_parts_count=0;
+    uint32_t visited_parts_count=0;
     visit_all_parts(c, OPC_PART_INVALID, &visited_parts_array, &visited_parts_count);
     for(opcPart part=opcPartGetFirst(c);OPC_PART_INVALID!=part;part=opcPartGetNext(c, part)) {
         if (!is_visited_part(visited_parts_array, visited_parts_count, part)) {
@@ -285,13 +285,13 @@ static void generate(opcContainer *c, FILE *out, const char *template_name, cons
     fprintf(out, "    va_start(ap, s);\n");
     fprintf(out, "    char buf[1024];\n");
     fprintf(out, "    int len=vsnprintf(buf, sizeof(buf), s, ap);\n");
-    fprintf(out, "    opcContainerWriteOutputStream(stream, (const opc_uint8_t *)buf, len);\n");
+    fprintf(out, "    opcContainerWriteOutputStream(stream, (const uint8_t *)buf, len);\n");
     fprintf(out, "    va_end(ap);\n");
     fprintf(out, "}\n");
     fprintf(out, "\n");
     fprintf(out, "void writes(opcContainerOutputStream* stream, const char *s) {\n");
     fprintf(out, "    int const len=strlen(s);\n");
-    fprintf(out, "    opcContainerWriteOutputStream(stream, (const opc_uint8_t *)s, len);\n");
+    fprintf(out, "    opcContainerWriteOutputStream(stream, (const uint8_t *)s, len);\n");
     fprintf(out, "}\n");
     fprintf(out, "\n");
     generate_parts(c, out);
@@ -323,7 +323,7 @@ static void generate(opcContainer *c, FILE *out, const char *template_name, cons
     fprintf(out, "    }\n");
     fprintf(out, "    opcFreeLibrary();\n");
     fprintf(out, "#ifdef WIN32\n");
-    fprintf(out, "    OPC_ASSERT(!_CrtDumpMemoryLeaks());\n");
+    fprintf(out, "    assert(!_CrtDumpMemoryLeaks());\n");
     fprintf(out, "#endif\n");
     fprintf(out, "}\n");
 }
@@ -363,7 +363,7 @@ int main( int argc, const char* argv[] )
     time_t end_time=time(NULL);
     fprintf(stderr, "time %.2lfsec\n", difftime(end_time, start_time));
 #ifdef WIN32
-    OPC_ASSERT(!_CrtDumpMemoryLeaks());
+    assert(!_CrtDumpMemoryLeaks());
 #endif
     return (OPC_ERROR_NONE==err?0:3);	
 }

@@ -83,7 +83,7 @@ int main( int argc, const char* argv[] )
             if (NULL!=cp.identifier.str) printPair("identifier", &cp.identifier);
             if (cp.keyword_items>0) {
                 printf("keywords={");
-                for(opc_uint32_t i=0;i<cp.keyword_items;i++) {
+                for(uint32_t i=0;i<cp.keyword_items;i++) {
                     printValue(&cp.keyword_array[i]);
                     if (i+1<cp.keyword_items) printf(", ");
                 }
@@ -115,7 +115,7 @@ int main( int argc, const char* argv[] )
     time_t end_time=time(NULL);
     fprintf(stderr, "time %.2lfsec\n", difftime(end_time, start_time));
 #ifdef WIN32
-    OPC_ASSERT(!_CrtDumpMemoryLeaks());
+    assert(!_CrtDumpMemoryLeaks());
 #endif
     return (OPC_ERROR_NONE==err?0:3);
 }

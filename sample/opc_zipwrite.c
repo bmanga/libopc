@@ -66,10 +66,10 @@ static opc_error_t addSegment(void *iocontext,
     return OPC_ERROR_NONE;
 }
 
-static opc_error_t releaseSegment(opcZip *zip, opc_uint32_t segment_id) {
+static opc_error_t releaseSegment(opcZip *zip, uint32_t segment_id) {
     const xmlChar *name=NULL;
     OPC_ENSURE(OPC_ERROR_NONE==opcZipGetSegmentInfo(zip, segment_id, &name, NULL, NULL));
-    OPC_ASSERT(NULL!=name);
+    assert(NULL!=name);
     xmlFree((void*)name);
     return OPC_ERROR_NONE;
 }
@@ -93,15 +93,15 @@ int main( int argc, const char* argv[] )
                         if (0==strcmp(argv[i], "--import")) { // import existing segments
                             OPC_ENSURE(OPC_ERROR_NONE==opcZipLoader(&io, zip, addSegment));
                         } else if (0==strcmp(argv[i], "--delete")) { // delete all segments
-                            for(opc_uint32_t i=opcZipGetFirstSegmentId(zip);-1!=i;i=opcZipGetNextSegmentId(zip, i)) {
-                                opc_uint32_t first_segment=i;
-                                opc_uint32_t last_segment=i;
+                            for(uint32_t i=opcZipGetFirstSegmentId(zip);-1!=i;i=opcZipGetNextSegmentId(zip, i)) {
+                                uint32_t first_segment=i;
+                                uint32_t last_segment=i;
                                 OPC_ENSURE(opcZipSegmentDelete(zip, &first_segment, &last_segment, releaseSegment));
                             }
                         } else if (0==strcmp(argv[i], "--add")) { // add sample streams
                             static char txt[]="Hello World!";
-                            opc_uint32_t segment1_id=opcZipCreateSegment(zip, xmlStrdup(BAD_CAST("hello.txt")), false, 47+5, 0, 0, 0);
-                            opc_uint32_t segment2_id=opcZipCreateSegment(zip, xmlStrdup(BAD_CAST("stream.txt")), false, 47+5, 0, 8, 6);
+                            uint32_t segment1_id=opcZipCreateSegment(zip, xmlStrdup(BAD_CAST("hello.txt")), false, 47+5, 0, 0, 0);
+                            uint32_t segment2_id=opcZipCreateSegment(zip, xmlStrdup(BAD_CAST("stream.txt")), false, 47+5, 0, 8, 6);
                             if (-1!=segment1_id) {
                                 opcZipOutputStream *out=opcZipOpenOutputStream(zip, &segment1_id);
                                 OPC_ENSURE(opcZipWriteOutputStream(zip, out, BAD_CAST(txt), strlen(txt))==strlen(txt));
@@ -129,7 +129,7 @@ int main( int argc, const char* argv[] )
     time_t end_time=time(NULL);
     fprintf(stdout, "time %.2lfsec\n", difftime(end_time, start_time));
 #ifdef WIN32
-    OPC_ASSERT(!_CrtDumpMemoryLeaks());
+    assert(!_CrtDumpMemoryLeaks());
 #endif
     return (OPC_ERROR_NONE==err?0:3);
 }

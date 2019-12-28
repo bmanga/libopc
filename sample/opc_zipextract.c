@@ -57,23 +57,23 @@ static opc_error_t loadSegment(void *iocontext,
     opcZip *zip=(opcZip*)userctx;
 //    OPC_ENSURE(0==skip(iocontext));
     OPC_ENSURE(0==open(iocontext));
-    opc_uint32_t crc=0;
+    uint32_t crc=0;
     char buf[100];
     int ret=0;
     while((ret=read(iocontext, buf, sizeof(buf)))>0) {
         crc=crc32(crc, (const Bytef*)buf, ret);
     }
-    OPC_ASSERT(info->data_crc==crc);
-    OPC_ASSERT(ret>=0);
+    assert(info->data_crc==crc);
+    assert(ret>=0);
     OPC_ENSURE(0==close(iocontext));
     opcZipLoadSegment(zip, xmlStrdup(info->name), info->rels_segment, info);
     return OPC_ERROR_NONE;
 }
 
-static opc_error_t releaseSegment(opcZip *zip, opc_uint32_t segment_id) {
+static opc_error_t releaseSegment(opcZip *zip, uint32_t segment_id) {
     const xmlChar *name=NULL;
     OPC_ENSURE(OPC_ERROR_NONE==opcZipGetSegmentInfo(zip, segment_id, &name, NULL, NULL));
-    OPC_ASSERT(NULL!=name);
+    assert(NULL!=name);
     xmlFree((void*)name);
     return OPC_ERROR_NONE;
 }
@@ -95,26 +95,26 @@ int main( int argc, const char* argv[] )
                     err=opcZipLoader(&io, zip, loadSegment);
                     if (OPC_ERROR_NONE==err) {
                         // successfully loaded; dump all segments
-                        for(opc_uint32_t segment_id=opcZipGetFirstSegmentId(zip);
+                        for(uint32_t segment_id=opcZipGetFirstSegmentId(zip);
                             -1!=segment_id;
                             segment_id=opcZipGetNextSegmentId(zip, segment_id)) {
                             const xmlChar *name=NULL;
                             bool rels_segment=false;
-                            opc_uint32_t data_crc=0;
+                            uint32_t data_crc=0;
                             OPC_ENSURE(OPC_ERROR_NONE==opcZipGetSegmentInfo(zip, segment_id, &name, &rels_segment, &data_crc));
-                            OPC_ASSERT(NULL!=name);
+                            assert(NULL!=name);
                             if (!rels_segment && 0==xmlStrcmp(name, BAD_CAST(argv[2]))) {
                                 printf("extracting  \"%s\"\n", name);
                                 opcZipInputStream *stream=opcZipOpenInputStream(zip, segment_id);
                                 if (NULL!=stream) {
-                                    opc_uint32_t crc=0;
-                                    opc_uint8_t buf[100];
-                                    opc_uint32_t ret=0;
+                                    uint32_t crc=0;
+                                    uint8_t buf[100];
+                                    uint32_t ret=0;
                                     while((ret=opcZipReadInputStream(zip, stream , buf, sizeof(buf)))>0) {
 //                                        printf("%.*s", ret, buf);
                                         crc=crc32(crc, (const Bytef*)buf, ret);
                                     }
-                                    OPC_ASSERT(crc==data_crc);
+                                    assert(crc==data_crc);
                                     opcZipCloseInputStream(zip, stream);
                                 }
                             } else {
@@ -134,7 +134,7 @@ int main( int argc, const char* argv[] )
     time_t end_time=time(NULL);
     fprintf(stderr, "time %.2lfsec\n", difftime(end_time, start_time));
 #ifdef WIN32
-    OPC_ASSERT(!_CrtDumpMemoryLeaks());
+    assert(!_CrtDumpMemoryLeaks());
 #endif
     return (OPC_ERROR_NONE==err?0:3);
 }

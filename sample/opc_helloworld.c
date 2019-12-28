@@ -54,7 +54,7 @@ int main( int argc, const char* argv[] )
 		printf("libopc as well as zlib and libxml2 are ready to use.\n");
 		opcFreeLibrary();
 #ifdef WIN32
-    OPC_ASSERT(!_CrtDumpMemoryLeaks());
+    assert(!_CrtDumpMemoryLeaks());
 #endif
 		return 0;
 	}  else  {

@@ -41,6 +41,7 @@
     opc_image OOXMLI1.docx C:\Users\flr\Pictures
 */
 
+#include <opc/opc.h>
 #include <stdio.h>
 #include <time.h>
 #ifdef WIN32
@@ -49,7 +50,7 @@
 
 static void extract(opcContainer *c, opcPart p, const char *path) {
     char filename[OPC_MAX_PATH];
-    opc_uint32_t i=xmlStrlen(p);
+    uint32_t i=xmlStrlen(p);
     while(i>0 && p[i]!='/') i--;
     if (p[i]=='/') i++;    
     strcpy(filename, path);
@@ -58,8 +59,8 @@ static void extract(opcContainer *c, opcPart p, const char *path) {
     if (NULL!=out) {
         opcContainerInputStream *stream=opcContainerOpenInputStream(c, p);
         if (NULL!=stream) {
-            opc_uint32_t  ret=0;
-            opc_uint8_t buf[100];
+            uint32_t  ret=0;
+            uint8_t buf[100];
             while((ret=opcContainerReadInputStream(stream, buf, sizeof(buf)))>0) {
                 fwrite(buf, sizeof(char), ret, out);
             }
@@ -92,7 +93,7 @@ int main( int argc, const char* argv[] )
     }
     opcFreeLibrary();
 #ifdef WIN32
-    OPC_ASSERT(!_CrtDumpMemoryLeaks());
+    assert(!_CrtDumpMemoryLeaks());
 #endif
     return 0;
 }

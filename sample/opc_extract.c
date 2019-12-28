@@ -66,10 +66,10 @@ int main( int argc, const char* argv[] )
             if ((part=opcPartFind(c, BAD_CAST(argv[2]), NULL, 0))!=OPC_PART_INVALID) {
                 opcContainerInputStream *stream=NULL;
                 if ((stream=opcContainerOpenInputStream(c, part))!=NULL){
-                    opc_uint8_t buf[100];
-                    opc_uint32_t len=0;
+                    uint8_t buf[100];
+                    uint32_t len=0;
                     while((len=opcContainerReadInputStream(stream, buf, sizeof(buf)))>0) {
-                        fwrite(buf, sizeof(opc_uint8_t), len, stdout);
+                        fwrite(buf, sizeof(uint8_t), len, stdout);
                     }
                     opcContainerCloseInputStream(stream);
                 } else {
@@ -90,7 +90,7 @@ int main( int argc, const char* argv[] )
         fprintf(stderr, "Sample: opc_extract test.docx word/document.xml\n");
     }
 #ifdef WIN32
-    OPC_ASSERT(!_CrtDumpMemoryLeaks());
+    assert(!_CrtDumpMemoryLeaks());
 #endif
     return 0;
 }

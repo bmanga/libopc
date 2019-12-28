@@ -56,9 +56,9 @@ int main( int argc, const char* argv[] )
         opcContainer *c=NULL;
         FILE *f=fopen(argv[1], "rb");
         fseek(f, 0, SEEK_END);
-        opc_uint32_t data_len=ftell(f);
+        uint32_t data_len=ftell(f);
         fseek(f, 0, SEEK_SET);
-        opc_uint8_t *data=(opc_uint8_t *)xmlMalloc(data_len);
+        uint8_t *data=(uint8_t *)xmlMalloc(data_len);
         size_t fread_len=fread(data, 1, data_len, f);
         fclose(f);
 	if (data_len!=fread_len) {
@@ -82,7 +82,7 @@ int main( int argc, const char* argv[] )
     time_t end_time=time(NULL);
     fprintf(stderr, "time %.2lfsec\n", difftime(end_time, start_time));
 #ifdef WIN32
-    OPC_ASSERT(!_CrtDumpMemoryLeaks());
+    assert(!_CrtDumpMemoryLeaks());
 #endif
     return (OPC_ERROR_NONE==err?0:3);	
 }

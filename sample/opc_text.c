@@ -114,7 +114,7 @@ int main( int argc, const char* argv[] )
     }
     opcFreeLibrary();
 #ifdef WIN32
-    OPC_ASSERT(!_CrtDumpMemoryLeaks());
+    assert(!_CrtDumpMemoryLeaks());
 #endif
     return 0;
 }

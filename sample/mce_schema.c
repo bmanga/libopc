@@ -5,7 +5,7 @@
 #include <crtdbg.h>
 #endif
 
-static pbool_t specialChar(int ch) {
+static bool specialChar(int ch) {
     return ch<'0' || (ch>'9' && ch<'A') || (ch>'Z' && ch<'a' && '_'!=ch) || ch>'z';
 }
 
@@ -16,9 +16,9 @@ xmlChar *readSourceLine(FILE *f) {
     while(EOF!=(ch=fgetc(f)) && '\n'!=ch) {
         ret=(xmlChar *)xmlRealloc(ret, len+2); // +2 => reserve trailing "0" too
         if (NULL!=ret) {
-            pbool_t ws=(ch==' ' || ch=='\t' || ch=='\r' || ch=='\n');
+            bool ws=(ch==' ' || ch=='\t' || ch=='\r' || ch=='\n');
             if (ws) {
-                pbool_t preceeding_ws=(len==0 && ws);
+                bool preceeding_ws=(len==0 && ws);
                 if (len>0 && !specialChar(ret[len-1])) {
                     ret[len++]=' ';
                 }
@@ -109,33 +109,33 @@ typedef struct SOURCE_QNAME {
 typedef struct SCHEMA_DECLARATION {
     xmlChar *ns;
     xmlChar *ln;
-    puint32_t def_id;
+    uint32_t def_id;
 } SchemaDeclaration;
 
 
 typedef struct SCHEMA_DEFINITION {
     xmlChar *name; // if definition has a name
-    puint32_t max_occurs;
+    uint32_t max_occurs;
     SchemaDeclaration *attr_array;
-    puint32_t attr_len;
+    uint32_t attr_len;
     SchemaDeclaration *decl_array;
-    puint32_t decl_len;
+    uint32_t decl_len;
 } SchemaDefinition;
 
 typedef struct SOURCE_CONTEXT {
     FILE *f;
     SourceQName *binding_array;
-    puint32_t binding_len;
+    uint32_t binding_len;
     SchemaDefinition *def_array;
-    puint32_t def_len;
+    uint32_t def_len;
     SchemaDeclaration *decl_array;
-    puint32_t decl_len;
-    pbool_t error_flag;
+    uint32_t decl_len;
+    bool error_flag;
 } SourceContext;
 
 
 static void addBinding(SourceContext *sc, const xmlChar *p, const xmlChar *ns) {
-    puint32_t i=0; 
+    uint32_t i=0; 
     while(i<sc->binding_len && 0!=xmlStrcmp(sc->binding_array[i].p, p)) i++;
     if (i==sc->binding_len) {
         sc->binding_array=(SourceQName*)xmlRealloc(sc->binding_array, (sc->binding_len+1)*sizeof(SourceQName));
@@ -143,7 +143,7 @@ static void addBinding(SourceContext *sc, const xmlChar *p, const xmlChar *ns) {
         memset(sc->binding_array+i, 0, sizeof(sc->binding_array[i]));
         sc->binding_array[i].p=xmlStrdup(p);
     } else {
-        OPC_ASSERT(0==xmlStrcmp(sc->binding_array[i].p, p));
+        assert(0==xmlStrcmp(sc->binding_array[i].p, p));
     }
     if (NULL!=sc->binding_array && i<sc->binding_len) {
         if (NULL!=sc->binding_array[i].ns) xmlFree(sc->binding_array[i].ns);
@@ -152,7 +152,7 @@ static void addBinding(SourceContext *sc, const xmlChar *p, const xmlChar *ns) {
 }
 
 static xmlChar *getBinding(SourceContext *sc, const xmlChar *p) {
-    puint32_t i=0; 
+    uint32_t i=0; 
     while(i<sc->binding_len && 0!=xmlStrcmp(sc->binding_array[i].p, p)) i++;
     if (i<sc->binding_len) {
         return sc->binding_array[i].ns;
@@ -161,10 +161,10 @@ static xmlChar *getBinding(SourceContext *sc, const xmlChar *p) {
     }
 }
 
-static puint32_t addDef(SourceContext *sc, xmlChar *def) {
+static uint32_t addDef(SourceContext *sc, xmlChar *def) {
     sc->def_array=(SchemaDefinition*)xmlRealloc(sc->def_array, (sc->def_len+1)*sizeof(SchemaDefinition));
     if (NULL!=sc->def_array) {
-        puint32_t i=sc->def_len++;
+        uint32_t i=sc->def_len++;
         memset(&sc->def_array[i], 0, sizeof(sc->def_array[i]));
         if (NULL!=def) {
             sc->def_array[i].name=xmlStrdup(def);
@@ -175,8 +175,8 @@ static puint32_t addDef(SourceContext *sc, xmlChar *def) {
     }
 }
 
-static puint32_t findDef(SourceContext *sc, xmlChar *def) {
-    for(puint32_t i=0;i<sc->def_len;i++) {
+static uint32_t findDef(SourceContext *sc, xmlChar *def) {
+    for(uint32_t i=0;i<sc->def_len;i++) {
         if (NULL!=sc->def_array[i].name && 0==xmlStrcmp(sc->def_array[i].name, def)) {
             return i;
         }
@@ -184,14 +184,14 @@ static puint32_t findDef(SourceContext *sc, xmlChar *def) {
     return -1;
 }
 
-static void freeDecls(SchemaDeclaration **decl_array, puint32_t *decl_len);
+static void freeDecls(SchemaDeclaration **decl_array, uint32_t *decl_len);
 static void freeDef(SchemaDefinition *def) {
     if (NULL!=def->name) xmlFree(def->name);
     freeDecls(&def->decl_array, &def->decl_len);
 }
 
 
-static SchemaDeclaration* addDecl(SchemaDeclaration **decl_array, puint32_t *decl_len, const xmlChar *ns, const xmlChar *ln) {
+static SchemaDeclaration* addDecl(SchemaDeclaration **decl_array, uint32_t *decl_len, const xmlChar *ns, const xmlChar *ln) {
     *decl_array=(SchemaDeclaration *)xmlRealloc(*decl_array, (1+*decl_len)*sizeof(SchemaDeclaration));
     if (NULL!=*decl_array) {
         memset((*decl_array)+(*decl_len), 0, sizeof((*decl_array)[(*decl_len)]));
@@ -204,9 +204,9 @@ static SchemaDeclaration* addDecl(SchemaDeclaration **decl_array, puint32_t *dec
     }
 }
 
-static void freeDecls(SchemaDeclaration **decl_array, puint32_t *decl_len) {
+static void freeDecls(SchemaDeclaration **decl_array, uint32_t *decl_len) {
     if (NULL!=*decl_array) {
-        for(puint32_t j=0;j<*decl_len;j++) {
+        for(uint32_t j=0;j<*decl_len;j++) {
             if (NULL!=(*decl_array)[j].ln) xmlFree((*decl_array)[j].ln);
             if (NULL!=(*decl_array)[j].ns) xmlFree((*decl_array)[j].ns);
         }
@@ -299,7 +299,7 @@ LineTokenId_t readLineToken(SourceContext *sc, LineTokenInstance* ti) {
                     int t=0; while (LINE_TOKEN_ID_INVALID!=s_token[t].id && 0!=xmlStrncmp(BAD_CAST(s_token[t].name), line+ofs, xmlStrlen(BAD_CAST(s_token[t].name)))) t++;
                     if (LINE_TOKEN_ID_INVALID!=s_token[t].id) {
                         ti->id=s_token[t].id;
-                        PASSERT(0==xmlStrncmp(BAD_CAST(s_token[ti->id].name), line+ofs, xmlStrlen(BAD_CAST(s_token[ti->id].name))));
+                        assert(0==xmlStrncmp(BAD_CAST(s_token[ti->id].name), line+ofs, xmlStrlen(BAD_CAST(s_token[ti->id].name))));
                         ofs+=xmlStrlen(BAD_CAST(s_token[t].name));
                         readParam(NULL, line, &ofs, ti->param[0], sizeof(ti->param[0]));
                         if (line[ofs]==',') { ofs++; readParam(sc, line, &ofs, ti->param[1], sizeof(ti->param[1])); }
@@ -357,8 +357,8 @@ static void errorToken(SourceContext *sc, LineTokenInstance *ti) {
     sc->error_flag=true;
 }
 
-static pbool_t parseDeclarations(SourceContext *sc, LineTokenInstance *ti, puint32_t def_id);
-static pbool_t parseStartDeclaration(SourceContext *sc, LineTokenInstance *ti, SchemaDeclaration **decl_array, puint32_t *decl_len) {
+static bool parseDeclarations(SourceContext *sc, LineTokenInstance *ti, uint32_t def_id);
+static bool parseStartDeclaration(SourceContext *sc, LineTokenInstance *ti, SchemaDeclaration **decl_array, uint32_t *decl_len) {
     if (LINE_TOKEN_ID_START_ELEMENT==ti->id || LINE_TOKEN_ID_START_ATTRIBUTE==ti->id || LINE_TOKEN_ID_START_TEXT==ti->id) {
         LineTokenId_t const end_id=(LINE_TOKEN_ID_START_ELEMENT==ti->id
                                    ?LINE_TOKEN_ID_END_ELEMENT:LINE_TOKEN_ID_START_ATTRIBUTE==ti->id?LINE_TOKEN_ID_END_ATTRIBUTE
@@ -366,7 +366,7 @@ static pbool_t parseStartDeclaration(SourceContext *sc, LineTokenInstance *ti, S
                                                                                                    ?LINE_TOKEN_ID_END_TEXT:ti->id);
 
         SchemaDeclaration *decl=addDecl(decl_array, decl_len, BAD_CAST(ti->param[1]), BAD_CAST(ti->param[2]));
-        PASSERT(NULL!=decl && -1==decl->def_id);
+        assert(NULL!=decl && -1==decl->def_id);
         readLineToken(sc, ti); // consume start token
         if (LINE_TOKEN_ID_REF==ti->id) {
             decl->def_id=findDef(sc, BAD_CAST(ti->param[0]));
@@ -376,12 +376,12 @@ static pbool_t parseStartDeclaration(SourceContext *sc, LineTokenInstance *ti, S
         } else {
             decl->def_id=addDef(sc, NULL);
         }
-        PASSERT(NULL!=decl && -1!=decl->def_id);
+        assert(NULL!=decl && -1!=decl->def_id);
         if (decl->def_id>=0 && decl->def_id<sc->def_len) {
             parseDeclarations(sc, ti, decl->def_id); // attributes
             parseDeclarations(sc, ti, decl->def_id); // children
             if (end_id==ti->id) {
-                sc->def_array[decl->def_id].max_occurs=PUINT32_MAX;
+                sc->def_array[decl->def_id].max_occurs=UINT32_MAX;
                 readLineToken(sc, ti); // consume end token
                 return true;
             }
@@ -390,7 +390,7 @@ static pbool_t parseStartDeclaration(SourceContext *sc, LineTokenInstance *ti, S
     return false;
 }
 
-static pbool_t parseDeclarations(SourceContext *sc, LineTokenInstance *ti, puint32_t def_id) {
+static bool parseDeclarations(SourceContext *sc, LineTokenInstance *ti, uint32_t def_id) {
     if (LINE_TOKEN_ID_START_CHILDREN==ti->id) {
         readLineToken(sc, ti); // consume start token
         while(parseStartDeclaration(sc, ti, &sc->def_array[def_id].decl_array, &sc->def_array[def_id].decl_len)) {
@@ -426,7 +426,7 @@ static pbool_t parseDeclarations(SourceContext *sc, LineTokenInstance *ti, puint
 }
 
 
-static pbool_t parseStartDocument(SourceContext *sc, LineTokenInstance *ti) {
+static bool parseStartDocument(SourceContext *sc, LineTokenInstance *ti) {
     if (LINE_TOKEN_ID_START_DOCUMENT==ti->id) {
         readLineToken(sc, ti); // consume start_document token
         if (parseStartDeclaration(sc, ti, &sc->decl_array, &sc->decl_len)) {
@@ -436,13 +436,13 @@ static pbool_t parseStartDocument(SourceContext *sc, LineTokenInstance *ti) {
     return false;
 }
 
-static pbool_t parseDefinition(SourceContext *sc, LineTokenInstance *ti) {
+static bool parseDefinition(SourceContext *sc, LineTokenInstance *ti) {
     if (LINE_TOKEN_ID_DEF==ti->id) {
-        puint32_t def_id=findDef(sc, BAD_CAST(ti->param[0]));
+        uint32_t def_id=findDef(sc, BAD_CAST(ti->param[0]));
         if (-1==def_id) {
             def_id=addDef(sc, BAD_CAST(ti->param[0]));
         }
-        PASSERT(-1!=def_id);
+        assert(-1!=def_id);
         readLineToken(sc, ti); // consume def token
         if (def_id>=0 && def_id<sc->def_len) {
             parseDeclarations(sc, ti, def_id); // attributes
@@ -454,20 +454,20 @@ static pbool_t parseDefinition(SourceContext *sc, LineTokenInstance *ti) {
 }
 
 static void dumpDecl(SourceContext *sc, FILE *out, int indent, SchemaDeclaration *decl);
-static void dumpDef(SourceContext *sc, FILE *out, int indent, puint32_t def_id) {
+static void dumpDef(SourceContext *sc, FILE *out, int indent, uint32_t def_id) {
     printf("%*sattrs:\n", indent, "");
-    for(puint32_t i=0;i<sc->def_array[def_id].attr_len;i++) {
+    for(uint32_t i=0;i<sc->def_array[def_id].attr_len;i++) {
         dumpDecl(sc, out, indent, &sc->def_array[def_id].attr_array[i]);
     }
     printf("%*schildren:\n", indent, "");
-    for(puint32_t i=0;i<sc->def_array[def_id].decl_len;i++) {
+    for(uint32_t i=0;i<sc->def_array[def_id].decl_len;i++) {
         dumpDecl(sc, out, indent, &sc->def_array[def_id].decl_array[i]);
     }
 }
 
 
 static void dumpDecl(SourceContext *sc, FILE *out, int indent, SchemaDeclaration *decl) {
-    pbool_t const has_children=(decl->def_id>=0 && decl->def_id<sc->def_len && NULL==sc->def_array[decl->def_id].name && (sc->def_array[decl->def_id].attr_len>0 || sc->def_array[decl->def_id].decl_len>0));
+    bool const has_children=(decl->def_id>=0 && decl->def_id<sc->def_len && NULL==sc->def_array[decl->def_id].name && (sc->def_array[decl->def_id].attr_len>0 || sc->def_array[decl->def_id].decl_len>0));
     fprintf(out, "%*s\"%s\" \"%s\" -> \"%s\" %s\n", indent, "", decl->ns, decl->ln, sc->def_array[decl->def_id].name, (has_children?" {":""));
     if (has_children) {
         dumpDef(sc, out, indent+2, decl->def_id);
@@ -476,7 +476,7 @@ static void dumpDecl(SourceContext *sc, FILE *out, int indent, SchemaDeclaration
 }
 
 void dumpGrammar(SourceContext *sc, FILE *out) {
-    for(puint32_t i=0;i<sc->def_len;i++) {
+    for(uint32_t i=0;i<sc->def_len;i++) {
         if (NULL!=sc->def_array[i].name) {
             fprintf(out, "def %s {\n", sc->def_array[i].name);
             dumpDef(sc, out, 2, i);
@@ -484,7 +484,7 @@ void dumpGrammar(SourceContext *sc, FILE *out) {
         }
     }
     fprintf(out, "start {\n");
-    for(puint32_t i=0;i<sc->decl_len;i++) {
+    for(uint32_t i=0;i<sc->decl_len;i++) {
         dumpDecl(sc, out, 2, &sc->decl_array[i]);
     }
     fprintf(out, "}\n");
@@ -532,7 +532,7 @@ int main( int argc, const char* argv[] )
     }
     dumpGrammar(&sc, stdout);
     if (NULL!=sc.binding_array) {
-        for(puint32_t i=0;i<sc.binding_len;i++) {
+        for(uint32_t i=0;i<sc.binding_len;i++) {
             if (NULL!=sc.binding_array[i].p) xmlFree(sc.binding_array[i].p);
             if (NULL!=sc.binding_array[i].ns) xmlFree(sc.binding_array[i].ns);
         }
@@ -540,7 +540,7 @@ int main( int argc, const char* argv[] )
     }
     freeDecls(&sc.decl_array, &sc.decl_len);
     if (NULL!=sc.def_array) {
-        for(puint32_t i=0;i<sc.def_len;i++) {
+        for(uint32_t i=0;i<sc.def_len;i++) {
             freeDef(&sc.def_array[i]);
         }
         xmlFree(sc.def_array);

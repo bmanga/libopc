@@ -133,7 +133,7 @@ int main( int argc, const char* argv[] )
         printf("Sample: opc_extract test.docx word/document.xml\n");
     }
 #ifdef WIN32
-    OPC_ASSERT(!_CrtDumpMemoryLeaks());
+    assert(!_CrtDumpMemoryLeaks());
 #endif
     return 0;
 }

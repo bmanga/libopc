@@ -56,7 +56,7 @@ static void traverse(opcContainer *c, opcPart source) {
         opcPart target=opcRelationGetInternalTarget(c, source, rel);
         if (OPC_PART_INVALID!=target) {
             const xmlChar *prefix=NULL;
-            opc_uint32_t counter=-1;
+            uint32_t counter=-1;
             const xmlChar *type=NULL;
             opcRelationGetInformation(c, source, rel, &prefix, &counter, &type);
             char buf[20]="";
@@ -102,7 +102,7 @@ int main( int argc, const char* argv[] )
     }
     opcFreeLibrary();
 #ifdef WIN32
-    OPC_ASSERT(!_CrtDumpMemoryLeaks());
+    assert(!_CrtDumpMemoryLeaks());
 #endif
     return 0;
 }
