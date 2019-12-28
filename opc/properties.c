@@ -32,8 +32,8 @@
 #include <opc/properties.h>
 #include <libxml/xmlmemory.h>
 #include <opc/xmlreader.h>
-#include <mce/textreader.h>
-#include <mce/textwriter.h>
+#include <opc/mce/textreader.h>
+#include <opc/mce/textwriter.h>
 
 opc_error_t opcCorePropertiesInit(opcProperties_t *cp) {
     opc_bzero_mem(cp, sizeof(*cp));

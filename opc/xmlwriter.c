@@ -30,7 +30,7 @@
  OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include <opc/opc.h>
-#include <mce/textreader.h>
+#include <opc/mce/textreader.h>
 
 
 static int opcTextWriterWrite(void * context, const char * buffer, int len) {

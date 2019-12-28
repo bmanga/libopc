@@ -40,7 +40,7 @@ add_library(opc2
   opc/mce/textwriter.c
   opc/mce/textwriter.h)
 
-target_include_directories(opc2 PUBLIC . ${LIBXML2_INCLUDE_DIR} opc/)
+target_include_directories(opc2 PUBLIC . ${LIBXML2_INCLUDE_DIR})
 target_link_libraries(opc2 PRIVATE ${LIBXML2_LIBRARIES} ZLIB::ZLIB)
 
 option (ENABLE_SAMPLES "Enable all targets in the sample/ folder" False)

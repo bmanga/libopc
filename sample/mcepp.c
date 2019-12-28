@@ -32,7 +32,7 @@
 
 #include <stdio.h>
 #include <time.h>
-#include <mce/textreader.h>
+#include <opc/mce/textreader.h>
 #include <libxml/xmlwriter.h>
 #include <libxml/xmlreader.h>
 #ifdef WIN32

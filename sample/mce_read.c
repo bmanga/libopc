@@ -29,7 +29,7 @@
  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED 
  OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#include <mce/textreader.h>
+#include <opc/mce/textreader.h>
 #include <stdio.h>
 #ifdef WIN32
 #include <crtdbg.h>

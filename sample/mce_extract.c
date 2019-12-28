@@ -39,7 +39,7 @@
     opc_xml OOXMLI1.docx "word/document.xml"
 */
 
-#include <config.h>
+#include <opc/config.h>
 #include <stdio.h>
 #include <time.h>
 #include <libxml/xmlwriter.h>
