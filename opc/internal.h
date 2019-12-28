@@ -38,11 +38,11 @@
 #ifndef OPC_INTERNAL_H
 #define OPC_INTERNAL_H
 
-#include <config.h>
+#include <opc/config.h>
 #include <opc/container.h>
 #include <opc/zip.h>
 #include <zlib.h>
-#include <mce/textreader.h>
+#include <opc/mce/textreader.h>
 
 #ifdef __cplusplus
 extern "C" {

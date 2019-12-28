@@ -33,7 +33,7 @@
 /** @file opc/file.h
  The opc module contains the file library functions.
 */
-#include <config.h>
+#include <opc/config.h>
 
 #ifndef OPC_FILE_H
 #define OPC_FILE_H

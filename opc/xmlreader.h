@@ -37,9 +37,9 @@
 #ifndef OPC_XMLREADER_H
 #define OPC_XMLREADER_H
 
-#include <config.h>
+#include <opc/config.h>
 #include <libxml/xmlreader.h>
-#include <mce/textreader.h>
+#include <opc/mce/textreader.h>
 
 
 #ifdef __cplusplus

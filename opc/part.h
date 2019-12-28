@@ -33,7 +33,7 @@
 /** @file opc/part.h
  
  */
-#include <config.h>
+#include <opc/config.h>
 
 #ifndef OPC_PART_H
 #define OPC_PART_H
