@@ -38,7 +38,7 @@
     Sample:
     opc_zipextract OOXMLI1.docx
 */
-config.h>/opc.h>
+#include <opc/opc.h>
 #include <stdio.h>
 #include <libxml/xmlstring.h>
 #include <time.h>

@@ -30,7 +30,7 @@
  OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-config.h>/opc.h>
+#include <opc/opc.h>
 #include <stdio.h>
 #include <string.h>
 #include <time.h>

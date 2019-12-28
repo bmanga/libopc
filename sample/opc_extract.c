@@ -40,7 +40,7 @@
 */
 
 
-config.h>/opc.h>
+#include <opc/opc.h>
 #include <stdio.h>
 #ifdef WIN32
 #include <io.h>

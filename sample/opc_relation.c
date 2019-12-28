@@ -46,7 +46,7 @@
     opc_relation OOXMLI1.docx "word/document.xml" "rId1"
 */
 
-config.h>/opc.h>
+#include <opc/opc.h>
 #ifdef WIN32
 #include <crtdbg.h>
 #endif

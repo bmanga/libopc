@@ -1,4 +1,4 @@
-config.h>/opc.h>
+#include <opc/opc.h>
 #include <stdio.h>
 #include <time.h>
 #ifdef WIN32
