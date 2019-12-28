@@ -4,16 +4,12 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <string.h>
-//#include <assert.h>
+#include <assert.h>
 #include <libxml/xmlstring.h>
 
 #ifndef __cplusplus
 #include <stdbool.h>
 #endif
-
-static inline void myassert(bool x) {}
-
-#define assert(x) myassert(x)
 
 
 #define OPC_MAX_PATH 512
