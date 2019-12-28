@@ -43,7 +43,15 @@ add_library(opc2
 target_include_directories(opc2 PUBLIC . ${LIBXML2_INCLUDE_DIR})
 target_link_libraries(opc2 PRIVATE ${LIBXML2_LIBRARIES} ZLIB::ZLIB)
 
+add_library(cppopc2
+	opc++/opc.hpp
+	opc++/opc.cpp opc++/container.hpp opc++/container.cpp)
+
+target_link_libraries(cppopc2 PRIVATE opc2)
+target_include_directories(cppopc2 PUBLIC . ${LIBXML2_INCLUDE_DIR})
+
 option (ENABLE_SAMPLES "Enable all targets in the sample/ folder" False)
 if(ENABLE_SAMPLES)
 	add_subdirectory(sample)
+	add_subdirectory(sample++)
 endif()
