@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 3.8)
 
-project(libopc-v2)
+project(libopc-v2 C CXX)
 
 find_package(LibXml2)
 find_package(ZLIB)
 
 add_library(opc2
-	config.h
+	opc/config.h
 	opc/container.c
 	opc/container.h
 	opc/file.c
